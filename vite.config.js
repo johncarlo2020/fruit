@@ -8,4 +8,19 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    build: {
+        rollupOptions: {
+            input: {
+                app: 'resources/js/app.js',
+            },
+            output: {
+                assetFileNames: 'assets/[name]-[hash][extname]',
+            },
+        },
+    },
+    resolve: {
+        alias: {
+            '@images': '/resourcess/images',
+        },
+    },
 });

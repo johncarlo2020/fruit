@@ -24,7 +24,7 @@
     .game-page {
         width: 100%;
         height: 100vh;
-        background-image: url('build/assets/images/Background.webp');
+        background-image: url({{ Vite::asset('resources/images/Background.webp') }});
         background-size: cover;
         background-position: center;
         position: relative;
@@ -57,17 +57,11 @@
         }, true); // The 'true' here sets the background to be transparent
 
         function preload() {
-            this.load.image('toast', 'http://www.pngmart.com/files/5/Toast-PNG-Free-Download.png');
-            this.load.image('burnt',
-                'http://pluspng.com/img-png/burnt-food-png-the-first-incident-involved-toast-or-to-be-more-precise-burnt-toast-246.png'
-            );
-            this.load.image('toaster',
-                'https://purepng.com/public/uploads/large/purepng.com-toastertoastertoast-makerelectric-smalltoast-sliced-breadheat-17015284328352zoyd.png'
-            );
-            this.load.image('good1', '{{ url('build/assets/images/orange.webp') }}');
-            this.load.image('good2', '{{ url('build/assets/images/Pomegranate.webp') }}');
-            this.load.image('bad1', '{{ url('build/assets/images/Rotten-peach.webp') }}');
-            this.load.image('bad2', '{{ url('build/assets/images/Rotten-apple.webp') }}');
+            this.load.crossOrigin = 'anonymous'; // Set crossOrigin attribute
+            this.load.image('good1', '{{ Vite::asset('resources/images/orange.webp') }}');
+            this.load.image('good2', '{{ Vite::asset('resources/images/Pomegranate.webp') }}');
+            this.load.image('bad1', '{{ Vite::asset('resources/images/Rotten-peach.webp') }}');
+            this.load.image('bad2', '{{ Vite::asset('resources/images/Rotten-apple.webp') }}');
         }
 
         var good_objects1, good_objects2, bad_objects1, bad_objects2, slashes, line, scoreLabel, score = 0,
@@ -75,6 +69,14 @@
 
         var fireRate = 3000;
         var nextFire = 0;
+
+        // Mapping of items to their points
+        var itemPoints = {
+            'good1': 10,
+            'good2': 15,
+            'bad1': -10,
+            'bad2': -15
+        };
 
         function create() {
             game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -151,12 +153,14 @@
             }
 
             slashes.clear();
-            slashes.beginFill(0xFFFFFF);
-            slashes.alpha = .5;
+            slashes.beginFill(0xFFFFFF, 1); // Set fill color to white
             slashes.moveTo(points[0].x, points[0].y);
             for (var i = 1; i < points.length; i++) {
                 slashes.lineTo(points[i].x, points[i].y);
             }
+            slashes.lineTo(points[points.length - 1].x + 5, points[points.length - 1].y + 5); // Create a pointy end
+            slashes.lineTo(points[0].x + 5, points[0].y + 5); // Create a pointy start
+            slashes.lineTo(points[0].x, points[0].y);
             slashes.endFill();
 
             for (var i = 1; i < points.length; i++) {
@@ -217,9 +221,21 @@
             emitter.x = fruit.x;
             emitter.y = fruit.y;
             emitter.start(true, 2000, null, 4);
+
+            // Display the points at the top left of the sliced item
+            var pointsValue = itemPoints[fruit.key];
+            var pointsText = game.add.text(fruit.x - fruit.width / 2, fruit.y - fruit.height / 2, (pointsValue > 0 ? '+' : '') + pointsValue, {
+                font: '32px Arial',
+                fill: '#000'
+            });
+            game.add.tween(pointsText).to({
+                y: pointsText.y - 50,
+                alpha: 0
+            }, 1000, Phaser.Easing.Linear.None, true);
+
             fruit.kill();
             points = [];
-            score++;
+            score += pointsValue;
             scoreLabel.text = 'Score: ' + score;
         }
     </script>

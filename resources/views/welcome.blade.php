@@ -20,10 +20,11 @@
         .welcome-page {
             width: 100%;
             height: 100vh;
-            background-image: url('{{ asset('build/assets/images/HomePage.webp') }}');
+            background-image: url('{{ Vite::asset('resources/images/HomePage.webp') }}');
             background-size: cover;
             background-position: center;
             position: relative;
+            transition: 0.5s;
         }
 
         .btn {
@@ -42,9 +43,74 @@
             text-align: center;
             font-size: 30px;
             font-weight: 700;
+            box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+            border: none;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .btn::after {
+            content: '';
+            display: block;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            /* background-image: url('{{ Vite::asset('resources/images/') }}'); */
+            z-index: -1;
+            transition: 0.5s;
         }
     </style>
     <body class="welcome-page">
-        <a class="btn" href="{{ url('/screen2') }}">Start</a>
+        <button class="btn">Start</button>
     </body>
+
+    <script>
+        var QRmode = false;
+        const page = document.querySelector('.welcome-page');
+        const btn = document.querySelector('.btn');
+
+        const flow = ['welcome', 'howtoplay', 'scanqr', 'countdown'];
+
+        let currentFlow = 0;
+
+        page.addEventListener('click', () => {
+            if (currentFlow === 0) {
+                page.style.backgroundImage = 'url({{ Vite::asset('resources/images/Howtoplay.webp') }})';
+                btn.style.display = 'none';
+                currentFlow++;
+            } else if (currentFlow === 1) {
+                page.style.backgroundImage = 'url({{ Vite::asset('resources/images/ScanQR.webp') }})';
+                currentFlow++;
+            } else if (currentFlow === 2) {
+                page.style.backgroundImage = 'url({{ Vite::asset('resources/images/Background.webp') }})';
+
+                const countdown = document.createElement('div');
+                countdown.style.position = 'absolute';
+                countdown.style.top = '50%';
+                countdown.style.left = '50%';
+
+                let count = 3;
+                countdown.innerText = count;
+                countdown.style.fontSize = '100px';
+                countdown.style.fontWeight = '700';
+                countdown.style.transform = 'translate(-50%, -50%)';
+                countdown.style.color = '#000000';
+
+                page.appendChild(countdown);
+
+                const interval = setInterval(() => {
+                    count--;
+                    countdown.innerText = count;
+
+                    if (count === 0) {
+                        clearInterval(interval);
+                        window.location.href = '{{ url('/game') }}';
+                        countdown.style.display = 'none';
+                    }
+                }, 1000);
+            }
+        });
+    </script>
 </html>

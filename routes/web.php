@@ -6,6 +6,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/screen2', function () {
+Route::get('/game', function () {
     return view('game');
 });
