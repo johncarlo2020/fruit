@@ -59,7 +59,9 @@
         }, true); // The 'true' here sets the background to be transparent
 
         function preload() {
-            this.load.crossOrigin = 'anonymous'; // Set crossOrigin attribute
+            this.load.crossOrigin = 'anonymous'; // Set crossOrigin
+            this.load.audio('sliceSound', '{{ Vite::asset('resources/sounds/slice.mp3') }}');
+            this.load.audio('backgroundMusic', '{{ Vite::asset('resources/sounds/background.mp3') }}');
             this.load.image('good1', '{{ Vite::asset('resources/images/orange.webp') }}');
             this.load.image('good2', '{{ Vite::asset('resources/images/Pomegranate.webp') }}');
             this.load.image('bad1', '{{ Vite::asset('resources/images/Rotten-peach.webp') }}');
@@ -130,6 +132,12 @@
             glitterEmitter.minParticleScale = 0.001;
             glitterEmitter.maxParticleScale = 0.09;
             glitterEmitter.start(false, 1000, 10);
+
+            sliceSound = game.add.audio('sliceSound');
+
+            backgroundMusic = game.add.audio('backgroundMusic');
+            backgroundMusic.loop = true;
+            backgroundMusic.play();
 
             throwObject();
         }
@@ -264,6 +272,8 @@
             particleEmitter.x = fruit.x;
             particleEmitter.y = fruit.y;
             particleEmitter.start(true, 2000, null, 4);
+
+            sliceSound.play();
 
             // Display the points at the top left of the sliced item
             var pointsValue = itemPoints[fruit.key];
