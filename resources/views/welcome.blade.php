@@ -27,6 +27,10 @@
             transition: 0.5s;
         }
 
+        .welcome-page {
+            cursor: url('{{ Vite::asset('resources/images/cursor.png') }}'), auto;
+        }
+
         .btn {
             display: block;
             padding: 15px 90px;
