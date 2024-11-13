@@ -17,6 +17,25 @@
         @endif
     </head>
     <style>
+        .name {
+            position: absolute;
+            top: 400px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 535px;
+            font-size: 70px;
+            background: url(http://[::1]:5173/resources/images/nametag.webp) no-repeat;
+            background-size: cover !important;
+            height: 180px;
+        }
+
+        .name h1 {
+            text-align: center;
+            padding: 10px;
+            margin: 0;
+            font-size: 60px;
+            margin-top: 66px;
+        }
         .welcome-page {
             width: 100%;
             height: 100vh;
@@ -33,9 +52,9 @@
 
         .btn {
             display: block;
-            padding: 15px 90px;
+            width: 323px;
+            height: 121px;
             margin: 20px;
-            background-color: #FFEEB8;
             color: #000000;
             text-decoration: none;
             border-radius: 5px;
@@ -43,14 +62,16 @@
             bottom: 20%;
             left: 50%;
             transform: translate(-50%, -50%);
-            padding: 100px,200px;
-            text-align: center;
-            font-size: 30px;
-            font-weight: 700;
-            box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
             border: none;
             cursor: pointer;
             outline: none;
+        }
+
+        .btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 5px;
         }
 
         .btn::after {
@@ -67,10 +88,24 @@
         }
     </style>
     <body class="welcome-page">
-        <button class="btn">Start</button>
+        <div class="welcome">
+
+        </div>
+        <a class="btn">
+            <img src="{{ Vite::asset('resources/images/start.webp') }}" alt="">
+        </a>
     </body>
 
     <script>
+        const audio = new Audio('{{ Vite::asset('resources/sounds/Background.mp3') }}');
+        audio.loop = true;
+        const countdownSound = new Audio('{{ Vite::asset('resources/sounds/countdown.mp3') }}');
+        var currentUser = null;
+
+        document.body.addEventListener('click', () => {
+                audio.play();
+            }, { once: true });
+
         var QRmode = false;
         const page = document.querySelector('.welcome-page');
         const btn = document.querySelector('.btn');
@@ -86,32 +121,41 @@
                 currentFlow++;
             } else if (currentFlow === 1) {
                 page.style.backgroundImage = 'url({{ Vite::asset('resources/images/ScanQR.webp') }})';
+                currentUser = 'Chammy';
+                localStorage.setItem('currentUser', currentUser);
                 currentFlow++;
             } else if (currentFlow === 2) {
-                page.style.backgroundImage = 'url({{ Vite::asset('resources/images/Background.webp') }})';
+                countdownSound.play();
+                page.style.backgroundImage = 'url({{ Vite::asset('resources/images/countdown.png') }})';
+                const name = document.createElement('h1');
+                name.innerText = currentUser;
 
-                const countdown = document.createElement('div');
-                countdown.style.position = 'absolute';
-                countdown.style.top = '50%';
-                countdown.style.left = '50%';
+                const nameContainer = document.createElement('div');
+                nameContainer.classList.add('name');
+                nameContainer.appendChild(name);
+                page.appendChild(nameContainer);
 
                 let count = 3;
-                countdown.innerText = count;
-                countdown.style.fontSize = '100px';
-                countdown.style.fontWeight = '700';
-                countdown.style.transform = 'translate(-50%, -50%)';
-                countdown.style.color = '#000000';
 
-                page.appendChild(countdown);
+
+                // create an img with center position
+                const img = document.createElement('img');
+                img.src = `{{ Vite::asset('resources/images/Welcome_3') }}.webp`;
+                img.style.position = 'absolute';
+                img.style.top = '50%';
+                img.style.left = '50%';
+                img.style.transform = 'translate(-50%, -50%)';
+                img.style.width = '15vw';
+                img.style.height = 'auto';
+                page.appendChild(img);
+
 
                 const interval = setInterval(() => {
                     count--;
-                    countdown.innerText = count;
-
+                    img.src = `{{ Vite::asset('resources/images/Welcome_') }}${count}.webp`;
                     if (count === 0) {
                         clearInterval(interval);
                         window.location.href = '{{ url('/game') }}';
-                        countdown.style.display = 'none';
                     }
                 }, 1000);
             }

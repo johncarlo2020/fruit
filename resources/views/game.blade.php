@@ -64,6 +64,9 @@
         function preload() {
             this.load.crossOrigin = 'anonymous'; // Set crossOrigin
             this.load.audio('sliceSound', '{{ Vite::asset('resources/sounds/slice.mp3') }}');
+            this.load.audio('goodSound', '{{ Vite::asset('resources/sounds/good.mp3') }}');
+            this.load.audio('badSound', '{{ Vite::asset('resources/sounds/bad.mp3') }}');
+            this.load.audio('pop', '{{ Vite::asset('resources/sounds/pop.mp3') }}');
             this.load.audio('special', '{{ Vite::asset('resources/sounds/success2.wav') }}');
             this.load.audio('backgroundMusic', '{{ Vite::asset('resources/sounds/background.mp3') }}');
             this.load.image('good1', '{{ Vite::asset('resources/images/orange.webp') }}');
@@ -98,14 +101,16 @@
             'good2': 15,
             'good3': 100,
             'good4': 20,
-            'good5': 25, // New object points
-            'good6': 30, // New object points
+            'good5': 25,
+            'good6': 30,
             'bad1': -10,
             'bad2': -15,
         };
 
+        let timeElapsed = 0;
+
         const objectSize = 160;
-        const berrySize = 250;
+        const berrySize = 160;
 
         function create() {
             game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -122,15 +127,22 @@
 
             slashes = game.add.graphics(0, 0);
 
-            scoreLabel = game.add.text(10, 10, 'Tip: get the green ones!');
-            scoreLabel.fill = 'black'; // Change text color to black
-
-            // Create timer label
-            timerLabel = game.add.text(game.world.width - 130, 10, 'Time: ' + gameTime, {
+            // Create timer label on the left side
+            timerLabel = game.add.text(10, 10, 'Time: ' + gameTime, {
                 font: '32px Arial',
                 weight: 'bold',
                 fill: '#000'
             });
+
+            // Create score label initially on the right side
+            scoreLabel = game.add.text(game.world.width - 130, 10, 'Score: 0', {
+                font: '32px Arial',
+                weight: 'bold',
+                fill: '#000'
+            });
+            scoreLabel.anchor.set(1, 0); // Anchor to the right so it expands to the left as it grows
+            scoreLabel.x = game.world.width - 10;
+
 
             // Create particle emitter
             particleEmitter = game.add.emitter(0, 0, 300);
@@ -157,21 +169,24 @@
 
             // Create sword cursor
             swordCursor = game.add.sprite(game.world.centerX, game.world.centerY, 'sword');
-            swordCursor.anchor.setTo(0.5, 1.0); // Set anchor to the bottom center
+            swordCursor.anchor.setTo(0.1, 1.0); // Set anchor to the bottom center
             swordCursor.scale.setTo(0.070, 0.070);
 
             // Create glitter emitter
             glitterEmitter = game.add.emitter(0, 0, 100);
             glitterEmitter.makeParticles('glitter');
-            glitterEmitter.gravity = 0;
-            glitterEmitter.setYSpeed(-50, 50);
+            glitterEmitter.gravity = 1;
+            glitterEmitter.setYSpeed(-50, 60);
             glitterEmitter.setXSpeed(-50, 50);
-            glitterEmitter.minParticleScale = 0.001;
-            glitterEmitter.maxParticleScale = 0.02;
-            glitterEmitter.start(false, 1000, 10);
+            glitterEmitter.minParticleScale = 0.002;
+            glitterEmitter.maxParticleScale = 0.006;
+            glitterEmitter.start(false, 1000, 5);
 
             sliceSound = game.add.audio('sliceSound');
             special = game.add.audio('special');
+            pop = game.add.audio('pop');
+            goodSound = game.add.audio('goodSound');
+            badSound = game.add.audio('badSound');
 
             backgroundMusic = game.add.audio('backgroundMusic');
             backgroundMusic.loop = true;
@@ -285,7 +300,6 @@
             game.physics.arcade.moveToXY(obj, game.world.centerX + Math.random() * 400 - Math.random() * 400, game.world
                 .centerY - Math.random() * 400, 530);
         }
-
         function update() {
             throwObject();
 
@@ -300,20 +314,49 @@
                 return;
             }
 
+            timeElapsed += this.game.time.elapsed / 1000; // Convert to seconds if needed
+            // Initialize the slash effect
             slashes.clear();
-            slashes.beginFill(0xFFFFFF, 1); // Set fill color to white
-            slashes.moveTo(points[0].x, points[0].y);
-            for (var i = 1; i < points.length; i++) {
-                slashes.lineTo(points[i].x, points[i].y);
+
+            // Define colors and line thickness
+            let color = 0xFFFF99;   // Light yellow for better contrast
+            let maxThickness = 12;   // Maximum thickness in the middle of the slash
+
+            // Calculate the dynamic thickness for a pointy effect at start and end
+            let thickness;
+            let midPoint = Math.floor(points.length / 2);
+
+            for (let i = 0; i < points.length - 1; i++) {
+                // Calculate thickness: thin at start and end, thicker in the middle
+                if (i < midPoint) {
+                    thickness = (maxThickness / midPoint) * i + 2; // Gradually increase
+                } else {
+                    thickness = (maxThickness / midPoint) * (points.length - i - 1) + 2; // Gradually decrease
+                }
+
+                // Set line style for the current segment
+                slashes.lineStyle(thickness, color, 1);
+
+                // Draw each segment individually to control the thickness dynamically
+                slashes.moveTo(points[i].x, points[i].y);
+                slashes.lineTo(points[i + 1].x, points[i + 1].y);
             }
-            slashes.lineTo(points[points.length - 1].x + 5, points[points.length - 1].y + 5); // Create a pointy end
-            slashes.lineTo(points[0].x + 5, points[0].y + 5); // Create a pointy start
-            slashes.lineTo(points[0].x, points[0].y);
-            slashes.endFill();
+
+            // Optional: Add a soft glow effect using blend mode
+            slashes.blendMode = Phaser.blendModes.ADD;
+
+            // Fade out effect based on timeElapsed (make sure timeElapsed is defined and incremented in your update)
+            slashes.alpha = Math.max(0, 1 - timeElapsed * 0.05);
+
+
+
+            if (slashes.alpha <= 0) {
+                timeElapsed = 0;  // Reset timeElapsed for a new slash effect
+            }
 
             for (var i = 1; i < points.length; i++) {
-                line = new Phaser.Line(points[i].x, points[i].y, points[i - 1].x);
-                game.debug.geom(line);
+                line = new Phaser.Line(points[i].x, points[i].y, points[i - 1].x, points[i - 1].y);
+                // game.debug.geom(line);
 
                 good_objects1.forEachExists(checkIntersects);
                 good_objects2.forEachExists(checkIntersects);
@@ -325,22 +368,19 @@
                 bad_objects2.forEachExists(checkIntersects);
             }
 
-            // Update sword cursor position
             swordCursor.x = game.input.x;
             swordCursor.y = game.input.y;
 
-            // Update glitter emitter position
             glitterEmitter.x = game.input.x;
             glitterEmitter.y = game.input.y;
 
-            //update the berryBg position
             if (continueThrowing === false) {
                 berryBg.x = selectedFruit.x;
                 berryBg.y = selectedFruit.y;
                 berryBg.visible = true;
                 berryBg.width += 5;
                 berryBg.height += 5;
-                // berryBg.angle += 1;
+                // berryBg.angle += 2;
                 game.world.sendToBack(berryBg);
                 game.world.moveUp(berryBg);
             } else {
@@ -352,15 +392,12 @@
 
         var contactPoint = new Phaser.Point(0, 0);
 
-        function checkIntersects(fruit, callback) {
-            var l1 = new Phaser.Line(fruit.body.right - fruit.width, fruit.body.bottom - fruit.height, fruit.body.right,
-                fruit.body.bottom);
-            var l2 = new Phaser.Line(fruit.body.right - fruit.width, fruit.body.bottom, fruit.body.right, fruit.body
-                .bottom - fruit.height);
-            l2.angle = 90;
+           function checkIntersects(fruit) {
+            var l1 = new Phaser.Line(fruit.body.x, fruit.body.y, fruit.body.x + fruit.body.width, fruit.body.y + fruit.body.height);
+            var l2 = new Phaser.Line(fruit.body.x, fruit.body.y + fruit.body.height, fruit.body.x + fruit.body.width, fruit.body.y);
 
             if (Phaser.Line.intersects(line, l1, true) || Phaser.Line.intersects(line, l2, true)) {
-                console.log('Intersection detected with:', fruit.key); // Add this line
+                console.log('Intersection detected with:', fruit.key);
 
                 contactPoint.x = game.input.x;
                 contactPoint.y = game.input.y;
@@ -369,8 +406,10 @@
                     return;
                 }
 
+                console.log('Distance:', distance, 'continueThrowing:', continueThrowing);
+
                 if (continueThrowing) {
-                    console.log('Killing fruit:', fruit.key); // Add this line
+                    console.log('Killing fruit:', fruit.key);
                     killFruit(fruit);
                 }
             }
@@ -398,7 +437,7 @@
         function popFruit(fruit) {
             particleEmitter.x = fruit.x;
             particleEmitter.y = fruit.y;
-            particleEmitter.start(true, 2000, null, 4);
+            particleEmitter.start(true, 2000, null, 10);
             confettiEmitter.x = fruit.x;
             confettiEmitter.y = fruit.y;
             confettiEmitter.start(true, 500, null, 30);
@@ -419,12 +458,20 @@
             }, 500, Phaser.Easing.Linear.None, true);
 
             // Reset the scale of the fruit before killing it
-            fruit.scale.setTo(1, 1);
+            fruit.width = objectSize;
+            fruit.height = objectSize;
             fruit.kill();
+
+            if(fruit.key === 'bad1' || fruit.key === 'bad2'){
+                badSound.play();
+            } else {
+                goodSound.play();
+            }
             continueThrowing = true;
         }
 
         function killFruit(fruit) {
+            console.log(fruit.key, ' continues throwing:', continueThrowing);
             selectedFruit = fruit;
             sliceSound.play();
             if (fruit.key === 'good3') {
