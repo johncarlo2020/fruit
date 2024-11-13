@@ -49,6 +49,8 @@
 <body class="game-page">
     <div id="game"></div>
     <script>
+        // create an item for local storage for leaderboard data is name and score and phone number
+
         var w = window.innerWidth,
             h = window.innerHeight;
 
@@ -92,7 +94,7 @@
         var fireRate = 3000;
         var nextFire = 0;
         var selectedFruit = null;
-        var gameTime = 60; // 60 seconds time limit
+        var gameTime = 5; // 60 seconds time limit
         var timerLabel;
 
         // Mapping of items to their points
@@ -208,26 +210,27 @@
         }
 
         function gameOver() {
-            continueThrowing = false;
-            backgroundMusic.stop();
-            hideAllElementsExcept(null);
-            stopAllElements();
+            var leaderboard = [];
+            // get currrnt user data from loacl storage
+            var currentUser = localStorage.getItem('currentUser');
+            // parse the data
+            currentUser = JSON.parse(currentUser);
 
-            // Display Game Over text
-            var gameOverText = game.add.text(game.world.centerX, game.world.centerY - 50, 'Game Over', {
-                font: '64px Arial',
-                fill: '#ff0000' // Red color
-            });
-            gameOverText.anchor.setTo(0.5, 0.5);
+            const data = {
+                name: currentUser.name,
+                score: score,
+                phone: currentUser.phone
+            };
 
-            // Display Restart button
-            var restartButton = game.add.text(game.world.centerX, game.world.centerY + 50, 'Restart', {
-                font: '32px Arial',
-                fill: '#000' // Black color
-            });
-            restartButton.anchor.setTo(0.5, 0.5);
-            restartButton.inputEnabled = true;
-            restartButton.events.onInputDown.add(restartGame, this);
+            localStorage.removeItem('currentUser');
+            localStorage.setItem('currentUser', JSON.stringify(data));
+
+            leaderboard.push(data);
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+
+            // go to finished page
+            window.location.href = '{{ url('/finished') }}';
+
         }
 
         function restartGame() {

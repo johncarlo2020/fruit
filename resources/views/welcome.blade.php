@@ -121,14 +121,32 @@
                 currentFlow++;
             } else if (currentFlow === 1) {
                 page.style.backgroundImage = 'url({{ Vite::asset('resources/images/ScanQR.webp') }})';
-                currentUser = 'Chammy';
-                localStorage.setItem('currentUser', currentUser);
+
+                const storedUserString = localStorage.getItem('currentUser');
+                if (storedUserString) {
+                    //remove the stored user
+                    localStorage.removeItem('currentUser');
+                }
+
+                currentUser = {
+                    name: 'John Doe',
+                    score: 0,
+                    phone: '123456789'
+                };
+
+                // Convert the object to a JSON string and store it in local storage
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
                 currentFlow++;
             } else if (currentFlow === 2) {
                 countdownSound.play();
                 page.style.backgroundImage = 'url({{ Vite::asset('resources/images/countdown.png') }})';
                 const name = document.createElement('h1');
-                name.innerText = currentUser;
+
+                //get the stored user
+                const storedUserString = localStorage.getItem('currentUser');
+                const user = JSON.parse(storedUserString).name;
+                name.innerText = user;
 
                 const nameContainer = document.createElement('div');
                 nameContainer.classList.add('name');
