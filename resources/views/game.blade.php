@@ -94,7 +94,7 @@
         var fireRate = 3000;
         var nextFire = 0;
         var selectedFruit = null;
-        var gameTime = 5; // 60 seconds time limit
+        var gameTime = 10; // 60 seconds time limit
         var timerLabel;
 
         // Mapping of items to their points
@@ -157,7 +157,7 @@
             //create berryBg
             berryBg = game.add.sprite(game.world.centerX, game.world.centerY, 'berryBg');
             berryBg.anchor.setTo(0.5, 0.5);
-            berryBg.scale.setTo(1,1);
+            berryBg.scale.setTo(1, 1);
             berryBg.visible = false;
 
             // Create confetti emitter
@@ -210,22 +210,46 @@
         }
 
         function gameOver() {
-            var leaderboard = [];
-            // get currrnt user data from loacl storage
-            var currentUser = localStorage.getItem('currentUser');
-            // parse the data
-            currentUser = JSON.parse(currentUser);
+            var leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
 
+            // Get the current user from local storage
+            var currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            // Check if the current user already exists on the leaderboard
+            let existingUserIndex = leaderboard.findIndex(user => user.id === currentUser.id);
             const data = {
+                id: currentUser.id,
                 name: currentUser.name,
                 score: score,
-                phone: currentUser.phone
+                phone: currentUser.phone,
+                email: currentUser.email
             };
-
-            localStorage.removeItem('currentUser');
             localStorage.setItem('currentUser', JSON.stringify(data));
+            if (existingUserIndex !== -1) {
+                // User exists on the leaderboard, check if the new score is higher
+                if (currentUser.score > leaderboard[existingUserIndex].score) {
+                    // Update the score if it's higher
+                    leaderboard[existingUserIndex] = {
+                        id: currentUser.id,
+                        name: currentUser.name,
+                        score: score,
+                        phone: currentUser.phone
+                    };
+                }
+            } else {
+                // User does not exist, add them to the leaderboard
+                leaderboard.push({
+                    id: currentUser.id,
+                    name: currentUser.name,
+                    score: score,
+                    phone: currentUser.phone
+                });
+            }
 
-            leaderboard.push(data);
+            // Sort leaderboard by score in ascending order
+            leaderboard.sort((a, b) => b.score - a.score);
+
+            // Update leaderboard in local storage
             localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
 
             // go to finished page
@@ -303,6 +327,7 @@
             game.physics.arcade.moveToXY(obj, game.world.centerX + Math.random() * 400 - Math.random() * 400, game.world
                 .centerY - Math.random() * 400, 530);
         }
+
         function update() {
             throwObject();
 
@@ -322,8 +347,8 @@
             slashes.clear();
 
             // Define colors and line thickness
-            let color = 0xFFFF99;   // Light yellow for better contrast
-            let maxThickness = 12;   // Maximum thickness in the middle of the slash
+            let color = 0xFFFF99; // Light yellow for better contrast
+            let maxThickness = 12; // Maximum thickness in the middle of the slash
 
             // Calculate the dynamic thickness for a pointy effect at start and end
             let thickness;
@@ -354,7 +379,7 @@
 
 
             if (slashes.alpha <= 0) {
-                timeElapsed = 0;  // Reset timeElapsed for a new slash effect
+                timeElapsed = 0; // Reset timeElapsed for a new slash effect
             }
 
             for (var i = 1; i < points.length; i++) {
@@ -395,9 +420,11 @@
 
         var contactPoint = new Phaser.Point(0, 0);
 
-           function checkIntersects(fruit) {
-            var l1 = new Phaser.Line(fruit.body.x, fruit.body.y, fruit.body.x + fruit.body.width, fruit.body.y + fruit.body.height);
-            var l2 = new Phaser.Line(fruit.body.x, fruit.body.y + fruit.body.height, fruit.body.x + fruit.body.width, fruit.body.y);
+        function checkIntersects(fruit) {
+            var l1 = new Phaser.Line(fruit.body.x, fruit.body.y, fruit.body.x + fruit.body.width, fruit.body.y + fruit.body
+                .height);
+            var l2 = new Phaser.Line(fruit.body.x, fruit.body.y + fruit.body.height, fruit.body.x + fruit.body.width, fruit
+                .body.y);
 
             if (Phaser.Line.intersects(line, l1, true) || Phaser.Line.intersects(line, l2, true)) {
                 console.log('Intersection detected with:', fruit.key);
@@ -465,7 +492,7 @@
             fruit.height = objectSize;
             fruit.kill();
 
-            if(fruit.key === 'bad1' || fruit.key === 'bad2'){
+            if (fruit.key === 'bad1' || fruit.key === 'bad2') {
                 badSound.play();
             } else {
                 goodSound.play();
