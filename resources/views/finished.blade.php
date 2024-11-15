@@ -137,7 +137,7 @@
         background: #FFEEB8 !important;
     }
 
-    .user tr::after {
+    .user tr td:first-child::before {
         position: absolute;
         content: '';
         width: 200px;
@@ -149,7 +149,11 @@
         background-repeat: no-repeat;
     }
 
-    .user tr::before {
+    .user tr td {
+        position: relative;
+    }
+
+    .user tr td:last-child::before{
         position: absolute;
         content: '';
         width: 200px;
@@ -276,6 +280,31 @@
             // Add a highlight class for the current user
             if (user.id === data.id) {
                 row.classList.add('user');
+                // create div inside first td and last td
+                const firstTd = row.querySelector('td:first-child');
+                const lastTd = row.querySelector('td:last-child');
+                const left = document.createElement('div');
+                left.style.width = '100px';
+                left.style.height = '100px';
+                left.style.position = 'absolute';
+                left.style.right = '-72px';
+                left.style.top = '172px';
+                left.style.backgroundImage = `url('{{ Vite::asset('resources/images/right.png') }}')`;
+                left.style.backgroundSize = 'contain';
+                left.style.backgroundRepeat = 'no-repeat';
+                firstTd.appendChild(left);
+
+                const right = document.createElement('div');
+                right.style.width = '100px';
+                right.style.height = '100px';
+                right.style.position = 'absolute';
+                right.style.left = '-37px';
+                right.style.top = '133px';
+
+                right.style.backgroundImage = `url('{{ Vite::asset('resources/images/left.png') }}')`;
+                right.style.backgroundSize = 'contain';
+                right.style.backgroundRepeat = 'no-repeat';
+                lastTd.appendChild(right);
             }
 
             // Append the row to the table body
