@@ -18,6 +18,24 @@
     @endif
 </head>
 <style>
+    @font-face {
+        font-family: 'Simonetta-Black';
+        src: url('{{ Vite::asset('resources/fonts/Simonetta-Black.ttf') }}') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Singulier-Bold';
+        src: url('{{ Vite::asset('resources/fonts/Singulier-Bold.ttf') }}') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    body {
+        font-family: 'Singulier-Bold', sans-serif;
+    }
+
     .name {
         position: absolute;
         top: 400px;
@@ -96,6 +114,7 @@
         border: 1px solid #ccc;
         top: 1016px;
         left: 366px;
+        display: none;
     }
 </style>
 
@@ -158,7 +177,11 @@
             btn.style.display = 'none';
             currentFlow++;
         } else if (currentFlow === 1) {
+            const scanner = document.querySelector('#scannerContainer');
             page.style.backgroundImage = 'url({{ Vite::asset('resources/images/ScanQR.webp') }})';
+            setTimeout(() => {
+                scanner.style.display = 'block';
+            }, 500);
 
             const html5QrCode = new Html5Qrcode("reader");
             html5QrCode.start({
@@ -170,26 +193,19 @@
                     },
                     qrCodeMessage => {
                         html5QrCode.stop();
-                        console.log(`${qrCodeMessage}`);
                         const {
                             id,
                             phone,
                             email,
                             name
                         } = extractDetails(`${qrCodeMessage}`);
-                        console.log("Id:", id);
-                        console.log("Phone:", phone);
-                        console.log("Email:", email);
-                        console.log("Name:", name);
+
                         const storedUserString = localStorage.getItem('currentUser');
 
                         if (storedUserString) {
                             //remove the stored user
                             localStorage.removeItem('currentUser');
-                            console.log('asdasda');
                         }
-                        console.log('a');
-
 
                         currentUser = {
                             id: id,
@@ -200,14 +216,17 @@
 
                         };
 
+                        console.log(qrCodeMessage);
+                        console.log(currentUser);
+
                         // Convert the object to a JSON string and store it in local storage
                         localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                        countdown();
+                        // countdown();
 
 
                     },
                     errorMessage => {
-                        console.log(`QR Code no longer in front of camera.`);
+
                     })
                 .catch(err => {
                     console.log(`Unable to start scanning, error: ${err}`);
@@ -216,7 +235,6 @@
     });
 
     function countdown() {
-        console.log('asdasda');
         countdownSound.play();
         page.style.backgroundImage = 'url({{ Vite::asset('resources/images/countdown.png') }})';
         const name = document.createElement('h1');

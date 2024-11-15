@@ -21,6 +21,24 @@
     <script src="https://cdn.jsdelivr.net/npm/phaser@2.6.2/build/phaser.min.js"></script>
 
     <style>
+
+        @font-face {
+            font-family: 'Simonetta-Black';
+            src: url('{{ Vite::asset('resources/fonts/Simonetta-Black.ttf') }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Singulier-Bold';
+            src: url('{{ Vite::asset('resources/fonts/Singulier-Bold.ttf') }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Singulier-Bold', sans-serif;
+        }
         .game-page {
             width: 100%;
             height: 100vh;
@@ -65,6 +83,8 @@
 
         function preload() {
             this.load.crossOrigin = 'anonymous'; // Set crossOrigin
+            this.load.text('Singulier-Bold', '{{ Vite::asset('resources/fonts/Singulier-Bold.ttf') }}');
+            this.load.text('Simonetta-Black', '{{ Vite::asset('resources/fonts/Simonetta-Black.ttf') }}');
             this.load.audio('sliceSound', '{{ Vite::asset('resources/sounds/slice.mp3') }}');
             this.load.audio('goodSound', '{{ Vite::asset('resources/sounds/good.mp3') }}');
             this.load.audio('badSound', '{{ Vite::asset('resources/sounds/bad.mp3') }}');
@@ -94,8 +114,9 @@
         var fireRate = 3000;
         var nextFire = 0;
         var selectedFruit = null;
-        var gameTime = 10; // 60 seconds time limit
+        var gameTime = 60;
         var timerLabel;
+        var highscore = 0;
 
         // Mapping of items to their points
         var itemPoints = {
@@ -130,20 +151,59 @@
             slashes = game.add.graphics(0, 0);
 
             // Create timer label on the left side
-            timerLabel = game.add.text(10, 10, 'Time: ' + gameTime, {
-                font: '32px Arial',
-                weight: 'bold',
-                fill: '#000'
+            const timeTextLabel = game.add.text(10, 10, 'TIME', {
+                fontFamily: 'Singulier-Bold',
+                fontSize: '32px',
+                fontWeight: 'bold',
+                color: '#000'
+            });
+
+            // Create timer value label below the "Time" label
+            timerLabel = game.add.text(35, 10 + timeTextLabel.height, '00', {
+                fontFamily: 'Singulier-Bold',
+                fontSize: '32px',
+                fontWeight: 'bold',
+                color: '#000'
+            });
+
+            let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+
+            let highscore = leaderboard.length > 0 ? leaderboard[0].score : 0;
+
+            const hightTextLabel = game.add.text(game.world.centerX, 10, 'HIGH SCORE OF THE DAY', {
+                fontFamily: 'Singulier-Bold',
+                fontSize: '32px',
+                fontWeight: 'bold',
+                color: '#000'
+            });
+
+            hightTextLabel.anchor.set(0.5, 0);
+
+            highscoreLabel = game.add.text(game.world.centerX,hightTextLabel.height + 10 , highscore, {
+                fontFamily: 'Singulier-Bold',
+                fontSize: '32px',
+                fontWeight: 'bold',
+                color: '#000'
+            });
+
+            highscoreLabel.anchor.set(0.5, 0);
+
+            const scoreLabelText = game.add.text(game.world.width - 120, 10, 'SCORE', {
+                fontFamily: 'Singulier-Bold',
+                fontSize: '32px',
+                fontWeight: 'bold',
+                color: '#000'
             });
 
             // Create score label initially on the right side
-            scoreLabel = game.add.text(game.world.width - 130, 10, 'Score: 0', {
-                font: '32px Arial',
-                weight: 'bold',
-                fill: '#000'
+            scoreLabel = game.add.text(game.world.width - 100, 10 + scoreLabelText.height, '0', {
+                fontFamily: 'Singulier-Bold',
+                fontSize: '32px',
+                fontWeight: 'bold',
+                color: '#000'
             });
-            scoreLabel.anchor.set(1, 0); // Anchor to the right so it expands to the left as it grows
-            scoreLabel.x = game.world.width - 10;
+            scoreLabel.anchor.set(1, 0);
+            scoreLabel.x = game.world.width - 20;
 
 
             // Create particle emitter
@@ -202,7 +262,7 @@
 
         function updateTimer() {
             gameTime--;
-            timerLabel.text = 'Time: ' + gameTime;
+            timerLabel.text = gameTime;
 
             if (gameTime <= 0) {
                 gameOver();
@@ -446,20 +506,16 @@
         }
 
         function resetScore() {
-            var highscore = Math.max(score, localStorage.getItem("highscore"));
-            localStorage.setItem("highscore", highscore);
-
             good_objects1.forEachExists(killFruit);
             good_objects2.forEachExists(killFruit);
             good_objects3.forEachExists(killFruit);
             good_objects4.forEachExists(killFruit);
-            good_objects5.forEachExists(killFruit); // New object
-            good_objects6.forEachExists(killFruit); // New object
+            good_objects5.forEachExists(killFruit);
+            good_objects6.forEachExists(killFruit);
             bad_objects1.forEachExists(killFruit);
             bad_objects2.forEachExists(killFruit);
 
             score = 0;
-            scoreLabel.text = 'Game Over!\nHigh Score: ' + highscore;
         }
 
         function render() {}
@@ -475,7 +531,7 @@
             var pointsValue = itemPoints[fruit.key];
             points = [];
             score += pointsValue;
-            scoreLabel.text = 'Score: ' + score;
+            scoreLabel.text = score;
 
             var pointsText = game.add.text(fruit.x - fruit.width / 2, fruit.y - fruit.height / 2, (pointsValue > 0 ? '+' :
                 '') + pointsValue, {

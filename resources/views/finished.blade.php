@@ -18,6 +18,23 @@
     @endif
 </head>
 <style>
+    @font-face {
+        font-family: 'Simonetta-Black';
+        src: url('{{ Vite::asset('resources/fonts/Simonetta-Black.ttf') }}') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Singulier-Bold';
+        src: url('{{ Vite::asset('resources/fonts/Singulier-Bold.ttf') }}') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    body {
+        font-family: 'Singulier-Bold', sans-serif;
+    }
     .name h1 {
         text-align: center;
         padding: 10px;
@@ -29,7 +46,7 @@
     .finish-page {
         width: 100%;
         height: 100vh;
-        background-image: url('{{ Vite::asset(' resources/images/Background.webp') }}');
+        background-image: url({{ Vite::asset('resources/images/Background.webp') }});
         background-size: cover;
         background-position: center;
         position: relative;
@@ -48,7 +65,6 @@
         transform: translateX(-50%);
         text-align: center;
         color: #000;
-        font-family: 'Arial';
         font-weight: 700;
     }
 
@@ -60,6 +76,8 @@
     .times-up h2 {
         font-size: 50px;
         margin-bottom: 5vh;
+        font-family: 'Simonetta-Black', sans-serif;
+        width: 100%;
     }
 
     .times-up p {
@@ -78,8 +96,8 @@
         left: 50%;
         transform: translateX(-50%);
         text-align: center;
-        font-family: 'Arial';
         display: none;
+        font-family: 'Simonetta-Black';
     }
 
     .table-container h1 {
@@ -117,6 +135,30 @@
 
     .user {
         background: #FFEEB8 !important;
+    }
+
+    .user tr::after {
+        position: absolute;
+        content: '';
+        width: 200px;
+        height: 200px;
+        right: 0;
+        top: 0;
+        background-image: url('{{ Vite::asset('resources/images/left.png') }}');
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    .user tr::before {
+        position: absolute;
+        content: '';
+        width: 200px;
+        height: 200px;
+        left: 0;
+        top: 0;
+        background-image: url('{{ Vite::asset('resources/images/right.png') }}');
+        background-size: contain;
+        background-repeat: no-repeat;
     }
 
     .btn {
