@@ -20,14 +20,14 @@
 <style>
     @font-face {
         font-family: 'Simonetta-Black';
-        src: url('{{ Vite::asset('resources/fonts/Simonetta-Black.ttf') }}') format('truetype');
+        src: url('{{ Vite::asset(' resources/fonts/Simonetta-Black.ttf') }}') format('truetype');
         font-weight: normal;
         font-style: normal;
     }
 
     @font-face {
         font-family: 'Singulier-Bold';
-        src: url('{{ Vite::asset('resources/fonts/Singulier-Bold.ttf') }}') format('truetype');
+        src: url('{{ Vite::asset(' resources/fonts/Singulier-Bold.ttf') }}') format('truetype');
         font-weight: normal;
         font-style: normal;
     }
@@ -35,6 +35,7 @@
     body {
         font-family: 'Singulier-Bold', sans-serif;
     }
+
     .name h1 {
         text-align: center;
         padding: 10px;
@@ -46,11 +47,13 @@
     .finish-page {
         width: 100%;
         height: 100vh;
-        background-image: url({{ Vite::asset('resources/images/Background.webp') }});
-        background-size: cover;
-        background-position: center;
-        position: relative;
-        transition: 0.5s;
+        background-image: url({{ Vite::asset('resources/images/Background.webp')
+    }
+    });
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    transition: 0.5s;
     }
 
     .finish-page {
@@ -144,7 +147,7 @@
         height: 200px;
         right: 0;
         top: 0;
-        background-image: url('{{ Vite::asset('resources/images/left.png') }}');
+        background-image: url('{{ Vite::asset(' resources/images/left.png') }}');
         background-size: contain;
         background-repeat: no-repeat;
     }
@@ -153,14 +156,14 @@
         position: relative;
     }
 
-    .user tr td:last-child::before{
+    .user tr td:last-child::before {
         position: absolute;
         content: '';
         width: 200px;
         height: 200px;
         left: 0;
         top: 0;
-        background-image: url('{{ Vite::asset('resources/images/right.png') }}');
+        background-image: url('{{ Vite::asset(' resources/images/right.png') }}');
         background-size: contain;
         background-repeat: no-repeat;
     }
@@ -248,6 +251,7 @@
     console.log(data);
     document.querySelector('.score').innerText = data.score;
     document.querySelector('.message').innerText = `Well done, ${data.name}!`;
+
 
     document.querySelector('#done').addEventListener('click', () => {
         // Change the background image

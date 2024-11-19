@@ -171,6 +171,68 @@
         };
     }
 
+    btn.addEventListener('mouseenter', () => {
+        page.style.backgroundImage = 'url({{ Vite::asset('resources/images/Howtoplay.webp') }})';
+        btn.style.display = 'none';
+        currentFlow++;
+        setTimeout(() => {
+            const scanner = document.querySelector('#scannerContainer');
+            page.style.backgroundImage = 'url({{ Vite::asset('resources/images/ScanQR.webp') }})';
+            setTimeout(() => {
+                scanner.style.display = 'block';
+            }, 500);
+
+            const html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start({
+                        facingMode: "environment"
+                    }, {
+                        fps: 10,
+                        qrbox: 200,
+                        aspectRatio: 9 / 16 // Set the aspect ratio to 16:9
+                    },
+                    qrCodeMessage => {
+                        html5QrCode.stop();
+                        const {
+                            id,
+                            phone,
+                            email,
+                            name
+                        } = extractDetails(`${qrCodeMessage}`);
+
+                        const storedUserString = localStorage.getItem('currentUser');
+
+                        if (storedUserString) {
+                            //remove the stored user
+                            localStorage.removeItem('currentUser');
+                        }
+
+                        currentUser = {
+                            id: id,
+                            name: name,
+                            score: 0,
+                            phone: phone,
+                            email: email
+
+                        };
+
+                        console.log(qrCodeMessage);
+                        console.log(currentUser);
+
+                        // Convert the object to a JSON string and store it in local storage
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        countdown();
+
+
+                    },
+                    errorMessage => {
+
+                    })
+                .catch(err => {
+                    console.log(`Unable to start scanning, error: ${err}`);
+                });
+        }, 3000);
+    });
+
     page.addEventListener('click', () => {
         if (currentFlow === 0) {
             page.style.backgroundImage = 'url({{ Vite::asset('resources/images/Howtoplay.webp') }})';
