@@ -38,7 +38,7 @@
 
     .name {
         position: absolute;
-        top: 400px;
+        top: 56%;
         left: 50%;
         transform: translateX(-50%);
         width: 535px;
@@ -59,7 +59,7 @@
     .welcome-page {
         width: 100%;
         height: 100vh;
-        background-image: url('{{ Vite::asset('resources/images/HomePage.webp') }}');
+        background-image: url('{{ Vite::asset('resources/images/Howtoplay.webp') }}');
         background-size: cover;
         background-position: center;
         position: relative;
@@ -79,7 +79,7 @@
         text-decoration: none;
         border-radius: 5px;
         position: absolute;
-        bottom: 20%;
+        bottom: 15%;
         left: 50%;
         transform: translate(-50%, -50%);
         border: none;
@@ -112,8 +112,8 @@
         width: 300px;
         height: 200px;
         border: 1px solid #ccc;
-        top: 1016px;
-        left: 366px;
+        top: 38%;
+        left: 36%;
         display: none;
         aspect-ratio: 9 / 16;
     }
@@ -185,62 +185,58 @@
         page.style.backgroundImage = 'url({{ Vite::asset('resources/images/Howtoplay.webp') }})';
         btn.style.display = 'none';
         currentFlow++;
-        setTimeout(() => {
-            const scanner = document.querySelector('#scannerContainer');
-            page.style.backgroundImage = 'url({{ Vite::asset('resources/images/ScanQR.webp') }})';
-            setTimeout(() => {
-                scanner.style.display = 'block';
-            }, 500);
+        const scanner = document.querySelector('#scannerContainer');
+        page.style.backgroundImage = 'url({{ Vite::asset('resources/images/ScanQR.webp') }})';
+        scanner.style.display = 'block';
 
-            const html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start({
-                        facingMode: "environment"
-                    }, {
-                        fps: 10,
-                        qrbox: 200,
-                        aspectRatio: 9 / 16 // Portrait orientation
-                    },
-                    qrCodeMessage => {
-                        html5QrCode.stop();
-                        const {
-                            id,
-                            phone,
-                            email,
-                            name
-                        } = extractDetails(`${qrCodeMessage}`);
+        const html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start({
+                    facingMode: "environment"
+                }, {
+                    fps: 10,
+                    qrbox: 250,
+                    aspectRatio: 9 / 16 // Portrait orientation
+                },
+                qrCodeMessage => {
+                    html5QrCode.stop();
+                    const {
+                        id,
+                        phone,
+                        email,
+                        name
+                    } = extractDetails(`${qrCodeMessage}`);
 
-                        const storedUserString = localStorage.getItem('currentUser');
+                    const storedUserString = localStorage.getItem('currentUser');
 
-                        if (storedUserString) {
-                            //remove the stored user
-                            localStorage.removeItem('currentUser');
-                        }
+                    if (storedUserString) {
+                        //remove the stored user
+                        localStorage.removeItem('currentUser');
+                    }
 
-                        currentUser = {
-                            id: id,
-                            name: name,
-                            score: 0,
-                            phone: phone,
-                            email: email
+                    currentUser = {
+                        id: id,
+                        name: name,
+                        score: 0,
+                        phone: phone,
+                        email: email
 
-                        };
+                    };
 
-                        console.log(qrCodeMessage);
-                        console.log(currentUser);
+                    console.log(qrCodeMessage);
+                    console.log(currentUser);
 
-                        // Convert the object to a JSON string and store it in local storage
-                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                        countdown();
+                    // Convert the object to a JSON string and store it in local storage
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    countdown();
 
 
-                    },
-                    errorMessage => {
+                },
+                errorMessage => {
 
-                    })
-                .catch(err => {
-                    console.log(`Unable to start scanning, error: ${err}`);
-                });
-        }, 3000);
+                })
+            .catch(err => {
+                console.log(`Unable to start scanning, error: ${err}`);
+            });
     });
 
     // page.addEventListener('click', () => {
@@ -308,7 +304,7 @@
 
     function countdown() {
         countdownSound.play();
-        page.style.backgroundImage = 'url({{ Vite::asset('resources/images/countdown.png') }})';
+        page.style.backgroundImage = 'url({{ Vite::asset('resources/images/countdown.webp') }})';
         const name = document.createElement('h1');
 
         //get the stored user
@@ -328,7 +324,7 @@
         const img = document.createElement('img');
         img.src = `{{ Vite::asset('resources/images/Welcome_3') }}.webp`;
         img.style.position = 'absolute';
-        img.style.top = '50%';
+        img.style.top = '75%';
         img.style.left = '50%';
         img.style.transform = 'translate(-50%, -50%)';
         img.style.width = '15vw';

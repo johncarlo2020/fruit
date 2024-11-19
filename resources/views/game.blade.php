@@ -350,19 +350,41 @@
 
         function throwGoodObject(group) {
             var obj = group.getFirstDead();
-            obj.reset(game.world.centerX + Math.random() * 200 - Math.random() * 200, game.world.height - 150);
+
+            // Random x position at the bottom of the game world
+            var randomX = Math.random() * game.world.width;
+            var startY = game.world.height - 50; // Start near the bottom
+
+            // Set object position at random x and bottom y
+            obj.reset(randomX, startY);
             obj.anchor.setTo(0.5, 0.5);
-            game.physics.arcade.moveToXY(obj, game.world.centerX + Math.random() * 400 - Math.random() * 400, game.world
-                .centerY - Math.random() * 400, 530);
+
+            // Move towards a random target within the top part of the screen
+            var targetX = Math.random() * game.world.width;
+            var targetY = Math.random() * (game.world.centerY - Math.random() * 200);
+
+            game.physics.arcade.moveToXY(obj, targetX, targetY, 530);
         }
 
         function throwBadObject(group) {
             var obj = group.getFirstDead();
-            obj.reset(game.world.centerX + Math.random() * 200 - Math.random() * 200, game.world.height - 150);
+
+            // Random x position at the bottom of the game world
+            var randomX = Math.random() * game.world.width;
+            var startY = game.world.height - 50; // Start near the bottom
+
+            // Set object position at random x and bottom y
+            obj.reset(randomX, startY);
             obj.anchor.setTo(0.5, 0.5);
-            game.physics.arcade.moveToXY(obj, game.world.centerX + Math.random() * 400 - Math.random() * 400, game.world
-                .centerY - Math.random() * 400, 530);
+
+            // Move towards a random target within the top part of the screen
+            var targetX = Math.random() * game.world.width;
+            var targetY = Math.random() * (game.world.centerY - Math.random() * 200);
+
+            game.physics.arcade.moveToXY(obj, targetX, targetY, 530);
         }
+
+
 
         function update() {
             throwObject();
