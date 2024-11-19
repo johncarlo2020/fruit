@@ -115,6 +115,7 @@
         top: 1016px;
         left: 366px;
         display: none;
+        aspect-ratio: 9 / 16;
     }
 </style>
 
@@ -197,7 +198,7 @@
                     }, {
                         fps: 10,
                         qrbox: 200,
-                        aspectRatio: 9 / 16 // Set the aspect ratio to 16:9
+                        aspectRatio: 9 / 16 // Portrait orientation
                     },
                     qrCodeMessage => {
                         html5QrCode.stop();
@@ -242,68 +243,68 @@
         }, 3000);
     });
 
-    page.addEventListener('click', () => {
-        if (currentFlow === 0) {
-            page.style.backgroundImage = 'url({{ Vite::asset('resources/images/Howtoplay.webp') }})';
-            btn.style.display = 'none';
-            currentFlow++;
-        } else if (currentFlow === 1) {
-            const scanner = document.querySelector('#scannerContainer');
-            page.style.backgroundImage = 'url({{ Vite::asset('resources/images/ScanQR.webp') }})';
-            setTimeout(() => {
-                scanner.style.display = 'block';
-            }, 500);
+    // page.addEventListener('click', () => {
+    //     if (currentFlow === 0) {
+    //         page.style.backgroundImage = 'url({{ Vite::asset('resources/images/Howtoplay.webp') }})';
+    //         btn.style.display = 'none';
+    //         currentFlow++;
+    //     } else if (currentFlow === 1) {
+    //         const scanner = document.querySelector('#scannerContainer');
+    //         page.style.backgroundImage = 'url({{ Vite::asset('resources/images/ScanQR.webp') }})';
+    //         setTimeout(() => {
+    //             scanner.style.display = 'block';
+    //         }, 500);
 
-            const html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start({
-                        facingMode: "environment"
-                    }, {
-                        fps: 10,
-                        qrbox: 200,
-                        aspectRatio: 9 / 16 // Set the aspect ratio to 16:9
-                    },
-                    qrCodeMessage => {
-                        html5QrCode.stop();
-                        const {
-                            id,
-                            phone,
-                            email,
-                            name
-                        } = extractDetails(`${qrCodeMessage}`);
+    //         const html5QrCode = new Html5Qrcode("reader");
+    //         html5QrCode.start({
+    //                     facingMode: "environment"
+    //                 }, {
+    //                     fps: 10,
+    //                     qrbox: 200,
+    //                     aspectRatio: 9 / 16 // Set the aspect ratio to 16:9
+    //                 },
+    //                 qrCodeMessage => {
+    //                     html5QrCode.stop();
+    //                     const {
+    //                         id,
+    //                         phone,
+    //                         email,
+    //                         name
+    //                     } = extractDetails(`${qrCodeMessage}`);
 
-                        const storedUserString = localStorage.getItem('currentUser');
+    //                     const storedUserString = localStorage.getItem('currentUser');
 
-                        if (storedUserString) {
-                            //remove the stored user
-                            localStorage.removeItem('currentUser');
-                        }
+    //                     if (storedUserString) {
+    //                         //remove the stored user
+    //                         localStorage.removeItem('currentUser');
+    //                     }
 
-                        currentUser = {
-                            id: id,
-                            name: name,
-                            score: 0,
-                            phone: phone,
-                            email: email
+    //                     currentUser = {
+    //                         id: id,
+    //                         name: name,
+    //                         score: 0,
+    //                         phone: phone,
+    //                         email: email
 
-                        };
+    //                     };
 
-                        console.log(qrCodeMessage);
-                        console.log(currentUser);
+    //                     console.log(qrCodeMessage);
+    //                     console.log(currentUser);
 
-                        // Convert the object to a JSON string and store it in local storage
-                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                        countdown();
+    //                     // Convert the object to a JSON string and store it in local storage
+    //                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    //                     countdown();
 
 
-                    },
-                    errorMessage => {
+    //                 },
+    //                 errorMessage => {
 
-                    })
-                .catch(err => {
-                    console.log(`Unable to start scanning, error: ${err}`);
-                });
-        };
-    });
+    //                 })
+    //             .catch(err => {
+    //                 console.log(`Unable to start scanning, error: ${err}`);
+    //             });
+    //     };
+    // });
 
     function countdown() {
         countdownSound.play();

@@ -248,7 +248,7 @@
     const data = JSON.parse(localStorage.getItem('currentUser'));
     console.log(data);
     document.querySelector('.score').innerText = data.score;
-    document.querySelector('.message').innerText = `Well done, ${data.name}!`;
+    document.querySelector('.message').innerHTML = `Well done,<br>${data.name}!`;
 
 
     document.querySelector('#done').addEventListener('mouseenter', () => {
