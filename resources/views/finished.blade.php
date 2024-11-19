@@ -13,21 +13,21 @@
 
     <!-- Styles / Scripts -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     @else
     @endif
 </head>
 <style>
     @font-face {
         font-family: 'Simonetta-Black';
-        src: url('{{ Vite::asset(' resources/fonts/Simonetta-Black.ttf') }}') format('truetype');
+        src: url('{{ Vite::asset('resources/fonts/Simonetta-Black.ttf') }}') format('truetype');
         font-weight: normal;
         font-style: normal;
     }
 
     @font-face {
         font-family: 'Singulier-Bold';
-        src: url('{{ Vite::asset(' resources/fonts/Singulier-Bold.ttf') }}') format('truetype');
+        src: url('{{ Vite::asset('resources/fonts/Singulier-Bold.ttf') }}') format('truetype');
         font-weight: normal;
         font-style: normal;
     }
@@ -47,18 +47,16 @@
     .finish-page {
         width: 100%;
         height: 100vh;
-        background-image: url({{ Vite::asset('resources/images/Background.webp')
-    }
-    });
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    transition: 0.5s;
+        background-image: url({{ Vite::asset('resources/images/Background.webp') }});
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        transition: 0.5s;
     }
 
     .finish-page {
         cursor: url('{{ Vite::asset(' resources/images/cursor.png') }}'),
-        auto;
+            auto;
     }
 
     .times-up {
@@ -147,7 +145,7 @@
         height: 200px;
         right: 0;
         top: 0;
-        background-image: url('{{ Vite::asset(' resources/images/left.png') }}');
+        background-image: url('{{ Vite::asset('resources/images/left.png') }}');
         background-size: contain;
         background-repeat: no-repeat;
     }
@@ -163,7 +161,7 @@
         height: 200px;
         left: 0;
         top: 0;
-        background-image: url('{{ Vite::asset(' resources/images/right.png') }}');
+        background-image: url('{{ Vite::asset('resources/images/right.png') }}');
         background-size: contain;
         background-repeat: no-repeat;
     }
@@ -255,7 +253,8 @@
 
     document.querySelector('#done').addEventListener('click', () => {
         // Change the background image
-        document.querySelector('.finish-page').style.backgroundImage = `url('{{ Vite::asset('resources/images/leaderBoard.png') }}')`;
+        document.querySelector('.finish-page').style.backgroundImage =
+            `url('{{ Vite::asset('resources/images/leaderBoard.png') }}')`;
         document.querySelector('.times-up').style.display = 'none';
         document.querySelector('.btn').style.display = 'none';
         document.querySelector('.table-container').style.display = 'block';
@@ -314,6 +313,11 @@
             // Append the row to the table body
             tableBody.appendChild(row);
         });
+
+        const interval = setInterval(() => {
+            window.location.href = '{{ url('/') }}';
+
+        }, 10000);
     });
 </script>
 
