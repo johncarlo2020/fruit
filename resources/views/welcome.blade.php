@@ -221,7 +221,7 @@
 
                         // Convert the object to a JSON string and store it in local storage
                         localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                        // countdown();
+                        countdown();
 
 
                     },
