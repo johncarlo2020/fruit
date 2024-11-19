@@ -283,7 +283,7 @@
             leaderboard.push({
                 id: currentUser.id,
                 name: currentUser.name,
-                score: score,
+                score: currentUser.score,
                 phone: currentUser.phone
             });
         }
