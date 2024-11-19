@@ -303,8 +303,9 @@
     // });
 
     function countdown() {
-        scanner.style.display = 'none';
         countdownSound.play();
+        const scanner = document.querySelector('#scannerContainer');
+        scanner.style.display = 'none';
         page.style.backgroundImage = 'url({{ Vite::asset('resources/images/countdown.webp') }})';
         const name = document.createElement('h1');
 
