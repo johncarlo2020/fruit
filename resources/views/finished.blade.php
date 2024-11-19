@@ -261,6 +261,38 @@
 
         // Populate the leaderboard table
         const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+        let existingUserIndex = leaderboard.findIndex(user => user.id === currentUser.id);
+        console.log(existingUserIndex);
+        console.log(leaderboard);
+        if (existingUserIndex !== -1) {
+            // User exists on the leaderboard, check if the new score is higher
+            if (currentUser.score > leaderboard[existingUserIndex].score) {
+                console.log('higher');
+                // Update the score if it's higher
+                leaderboard[existingUserIndex] = {
+                    id: currentUser.id,
+                    name: currentUser.name,
+                    score: currentUser.score,
+                    phone: currentUser.phone
+                };
+            }
+        } else {
+            // User does not exist, add them to the leaderboard
+            leaderboard.push({
+                id: currentUser.id,
+                name: currentUser.name,
+                score: score,
+                phone: currentUser.phone
+            });
+        }
+
+        // Sort leaderboard by score in ascending order
+        leaderboard.sort((a, b) => b.score - a.score);
+
+        // Update leaderboard in local storage
+        localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
 
         // Get the table body element
         const tableBody = document.querySelector('.table tbody');

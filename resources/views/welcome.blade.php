@@ -131,6 +131,15 @@
 </body>
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
+    (function() {
+        const lastClear = localStorage.getItem('lastClear');
+        const today = new Date().toDateString();
+
+        if (lastClear !== today) {
+            localStorage.clear();
+            localStorage.setItem('lastClear', today); // Update the last clear date
+        }
+    })();
     const audio = new Audio('{{ Vite::asset('resources/sounds/Background.mp3') }}');
     audio.loop = true;
     const countdownSound = new Audio('{{ Vite::asset('resources/sounds/countdown.mp3') }}');

@@ -21,7 +21,6 @@
     <script src="https://cdn.jsdelivr.net/npm/phaser@2.6.2/build/phaser.min.js"></script>
 
     <style>
-
         @font-face {
             font-family: 'Simonetta-Black';
             src: url('{{ Vite::asset('resources/fonts/Simonetta-Black.ttf') }}') format('truetype');
@@ -39,6 +38,7 @@
         body {
             font-family: 'Singulier-Bold', sans-serif;
         }
+
         .game-page {
             width: 100%;
             height: 100vh;
@@ -179,7 +179,7 @@
 
             hightTextLabel.anchor.set(0.5, 0);
 
-            highscoreLabel = game.add.text(game.world.centerX,hightTextLabel.height + 10 , highscore, {
+            highscoreLabel = game.add.text(game.world.centerX, hightTextLabel.height + 10, highscore, {
                 fontFamily: 'Singulier-Bold',
                 fontSize: '32px',
                 fontWeight: 'bold',
@@ -277,6 +277,7 @@
 
             // Check if the current user already exists on the leaderboard
             let existingUserIndex = leaderboard.findIndex(user => user.id === currentUser.id);
+            console.log(existingUserIndex);
             const data = {
                 id: currentUser.id,
                 name: currentUser.name,
@@ -285,32 +286,7 @@
                 email: currentUser.email
             };
             localStorage.setItem('currentUser', JSON.stringify(data));
-            if (existingUserIndex !== -1) {
-                // User exists on the leaderboard, check if the new score is higher
-                if (currentUser.score > leaderboard[existingUserIndex].score) {
-                    // Update the score if it's higher
-                    leaderboard[existingUserIndex] = {
-                        id: currentUser.id,
-                        name: currentUser.name,
-                        score: score,
-                        phone: currentUser.phone
-                    };
-                }
-            } else {
-                // User does not exist, add them to the leaderboard
-                leaderboard.push({
-                    id: currentUser.id,
-                    name: currentUser.name,
-                    score: score,
-                    phone: currentUser.phone
-                });
-            }
 
-            // Sort leaderboard by score in ascending order
-            leaderboard.sort((a, b) => b.score - a.score);
-
-            // Update leaderboard in local storage
-            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
 
             // go to finished page
             window.location.href = '{{ url('/finished') }}';
