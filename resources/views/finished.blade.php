@@ -290,6 +290,7 @@
 
         // Sort leaderboard by score in ascending order
         leaderboard.sort((a, b) => b.score - a.score);
+        leaderboard.splice(5);
 
         // Update leaderboard in local storage
         localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
