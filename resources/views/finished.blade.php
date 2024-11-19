@@ -251,7 +251,7 @@
     document.querySelector('.message').innerText = `Well done, ${data.name}!`;
 
 
-    document.querySelector('#done').addEventListener('click', () => {
+    document.querySelector('#done').addEventListener('mouseenter', () => {
         // Change the background image
         document.querySelector('.finish-page').style.backgroundImage =
             `url('{{ Vite::asset('resources/images/leaderBoard.png') }}')`;
