@@ -231,7 +231,7 @@
 
             // Create sword cursor
             swordCursor = game.add.sprite(game.world.centerX, game.world.centerY, 'sword');
-            swordCursor.anchor.setTo(0.1, 1.0); // Set anchor to the bottom center
+            swordCursor.anchor.setTo(1, 0);
             swordCursor.scale.setTo(0.070, 0.070);
 
             // Create glitter emitter
@@ -433,8 +433,6 @@
 
             // Fade out effect based on timeElapsed (make sure timeElapsed is defined and incremented in your update)
             slashes.alpha = Math.max(0, 1 - timeElapsed * 0.05);
-
-
 
             if (slashes.alpha <= 0) {
                 timeElapsed = 0; // Reset timeElapsed for a new slash effect
