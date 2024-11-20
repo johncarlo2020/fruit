@@ -12,22 +12,20 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Styles / Scripts -->
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-    @endif
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
 </head>
 <style>
     @font-face {
         font-family: 'Simonetta-Black';
-        src: url('{{ Vite::asset('resources/fonts/Simonetta-Black.ttf') }}') format('truetype');
+        src: url('/fonts/Simonetta-Black.ttf') format('truetype');
         font-weight: normal;
         font-style: normal;
     }
 
     @font-face {
         font-family: 'Singulier-Bold';
-        src: url('{{ Vite::asset('resources/fonts/Singulier-Bold.ttf') }}') format('truetype');
+        src: url('fonts/Singulier-Bold.ttf') format('truetype');
         font-weight: normal;
         font-style: normal;
     }
@@ -43,7 +41,7 @@
         transform: translateX(-50%);
         width: 535px;
         font-size: 70px;
-        background: url(http://[::1]:5173/resources/images/nametag.webp) no-repeat;
+        background: url(http://[::1]:5173/images/nametag.webp) no-repeat;
         background-size: cover !important;
         height: 180px;
     }
@@ -59,7 +57,7 @@
     .welcome-page {
         width: 100%;
         height: 100vh;
-        background-image: url('{{ Vite::asset('resources/images/Howtoplay.webp') }}');
+        background-image: url('images/Howtoplay.webp');
         background-size: cover;
         background-position: center;
         position: relative;
@@ -67,7 +65,7 @@
     }
 
     .welcome-page {
-        cursor: url('{{ Vite::asset('resources/images/cursor.png') }}'), auto;
+        cursor: url('images/cursor.png'), auto;
     }
 
     .btn {
@@ -102,7 +100,7 @@
         right: 0;
         width: 100%;
         height: 100%;
-        /* background-image: url('{{ Vite::asset('resources/images/') }}'); */
+        /* background-image: url('resources/images/'); */
         z-index: -1;
         transition: 0.5s;
     }
@@ -127,7 +125,8 @@
         </div>
     </div>
     <a class="btn">
-        <img src="{{ Vite::asset('resources/images/start.webp') }}" alt="">
+        <img src="{{ asset('images/start.webp') }}" alt="">
+
     </a>
 </body>
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -141,9 +140,9 @@
             localStorage.setItem('lastClear', today); // Update the last clear date
         }
     })();
-    const audio = new Audio('{{ Vite::asset('resources/sounds/Background.mp3') }}');
+    const audio = new Audio('{{ asset('sounds/background.mp3') }}');
     audio.loop = true;
-    const countdownSound = new Audio('{{ Vite::asset('resources/sounds/countdown.mp3') }}');
+    const countdownSound = new Audio('{{ asset('sounds/countdown.mp3') }}');
     var currentUser = null;
 
     document.body.addEventListener('click', () => {
@@ -182,11 +181,11 @@
     }
 
     btn.addEventListener('mouseenter', () => {
-        page.style.backgroundImage = 'url({{ Vite::asset('resources/images/Howtoplay.webp') }})';
+        page.style.backgroundImage = 'url({{ asset('images/Howtoplay.webp') }})';
         btn.style.display = 'none';
         currentFlow++;
         const scanner = document.querySelector('#scannerContainer');
-        page.style.backgroundImage = 'url({{ Vite::asset('resources/images/ScanQR.webp') }})';
+        page.style.backgroundImage = 'url({{ asset('images/ScanQR.webp') }})';
         scanner.style.display = 'block';
 
         const html5QrCode = new Html5Qrcode("reader");
@@ -239,74 +238,13 @@
             });
     });
 
-    // page.addEventListener('click', () => {
-    //     if (currentFlow === 0) {
-    //         page.style.backgroundImage = 'url({{ Vite::asset('resources/images/Howtoplay.webp') }})';
-    //         btn.style.display = 'none';
-    //         currentFlow++;
-    //     } else if (currentFlow === 1) {
-    //         const scanner = document.querySelector('#scannerContainer');
-    //         page.style.backgroundImage = 'url({{ Vite::asset('resources/images/ScanQR.webp') }})';
-    //         setTimeout(() => {
-    //             scanner.style.display = 'block';
-    //         }, 500);
 
-    //         const html5QrCode = new Html5Qrcode("reader");
-    //         html5QrCode.start({
-    //                     facingMode: "environment"
-    //                 }, {
-    //                     fps: 10,
-    //                     qrbox: 200,
-    //                     aspectRatio: 9 / 16 // Set the aspect ratio to 16:9
-    //                 },
-    //                 qrCodeMessage => {
-    //                     html5QrCode.stop();
-    //                     const {
-    //                         id,
-    //                         phone,
-    //                         email,
-    //                         name
-    //                     } = extractDetails(`${qrCodeMessage}`);
-
-    //                     const storedUserString = localStorage.getItem('currentUser');
-
-    //                     if (storedUserString) {
-    //                         //remove the stored user
-    //                         localStorage.removeItem('currentUser');
-    //                     }
-
-    //                     currentUser = {
-    //                         id: id,
-    //                         name: name,
-    //                         score: 0,
-    //                         phone: phone,
-    //                         email: email
-
-    //                     };
-
-    //                     console.log(qrCodeMessage);
-    //                     console.log(currentUser);
-
-    //                     // Convert the object to a JSON string and store it in local storage
-    //                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    //                     countdown();
-
-
-    //                 },
-    //                 errorMessage => {
-
-    //                 })
-    //             .catch(err => {
-    //                 console.log(`Unable to start scanning, error: ${err}`);
-    //             });
-    //     };
-    // });
 
     function countdown() {
         countdownSound.play();
         const scanner = document.querySelector('#scannerContainer');
         scanner.style.display = 'none';
-        page.style.backgroundImage = 'url({{ Vite::asset('resources/images/countdown.webp') }})';
+        page.style.backgroundImage = 'url({{ asset('images/countdown.webp') }})';
         const name = document.createElement('h1');
 
         //get the stored user
@@ -324,7 +262,7 @@
 
         // create an img with center position
         const img = document.createElement('img');
-        img.src = `{{ Vite::asset('resources/images/Welcome_3') }}.webp`;
+        img.src = `{{ asset('images/Welcome_3.webp') }}`;
         img.style.position = 'absolute';
         img.style.top = '75%';
         img.style.left = '50%';
@@ -336,7 +274,8 @@
 
         const interval = setInterval(() => {
             count--;
-            img.src = `{{ Vite::asset('resources/images/Welcome_') }}${count}.webp`;
+            const basePath = `{{ asset('images/Welcome_') }}`;
+            img.src = `${basePath}${count}.webp`;
             if (count === 0) {
                 clearInterval(interval);
                 window.location.href = '{{ url('/game') }}';

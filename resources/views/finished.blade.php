@@ -12,22 +12,19 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Styles / Scripts -->
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-    @endif
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <style>
     @font-face {
         font-family: 'Simonetta-Black';
-        src: url('{{ Vite::asset('resources/fonts/Simonetta-Black.ttf') }}') format('truetype');
+        src: url('{{ asset('/fonts/Simonetta-Black.ttf') }}') format('truetype');
         font-weight: normal;
         font-style: normal;
     }
 
     @font-face {
         font-family: 'Singulier-Bold';
-        src: url('{{ Vite::asset('resources/fonts/Singulier-Bold.ttf') }}') format('truetype');
+        src: url('{{ asset('/fonts/Singulier-Bold.ttf') }}') format('truetype');
         font-weight: normal;
         font-style: normal;
     }
@@ -47,7 +44,7 @@
     .finish-page {
         width: 100%;
         height: 100vh;
-        background-image: url({{ Vite::asset('resources/images/Background.webp') }});
+        background-image: url({{ asset('/images/Background.webp') }});
         background-size: cover;
         background-position: center;
         position: relative;
@@ -55,7 +52,7 @@
     }
 
     .finish-page {
-        cursor: url('{{ Vite::asset(' resources/images/cursor.png') }}'),
+        cursor: url('{{ asset('/images/cursor.png') }}'),
             auto;
     }
 
@@ -145,7 +142,7 @@
         height: 200px;
         right: 0;
         top: 0;
-        background-image: url('{{ Vite::asset('resources/images/left.png') }}');
+        background-image: url('{{ asset('/images/left.png') }}');
         background-size: contain;
         background-repeat: no-repeat;
     }
@@ -161,7 +158,7 @@
         height: 200px;
         left: 0;
         top: 0;
-        background-image: url('{{ Vite::asset('resources/images/right.png') }}');
+        background-image: url('{{ asset('/images/right.png') }}');
         background-size: contain;
         background-repeat: no-repeat;
     }
@@ -198,7 +195,7 @@
         right: 0;
         width: 100%;
         height: 100%;
-        /* background-image: url('{{ Vite::asset('resources/images/') }}'); */
+        /* background-image: url('{{ asset('resources/images/') }}'); */
         z-index: -1;
         transition: 0.5s;
     }
@@ -227,7 +224,7 @@
         </div>
     </div>
     <a id="done" class="btn">
-        <img src="{{ Vite::asset('resources/images/done.webp') }}" alt="">
+        <img src="{{ asset('/images/done.webp') }}" alt="">
     </a>
 </body>
 <script>
@@ -241,7 +238,7 @@
 
     // Set the date inside the h2 element
     document.getElementById('current-date').innerText = formattedDate;
-    const audio = new Audio('{{ Vite::asset('resources / sounds / Background.mp3') }}');
+    const audio = new Audio('{{ asset('/sounds/Background.mp3') }}');
     audio.loop = true;
     audio.play();
 
@@ -254,7 +251,7 @@
     document.querySelector('#done').addEventListener('mouseenter', () => {
         // Change the background image
         document.querySelector('.finish-page').style.backgroundImage =
-            `url('{{ Vite::asset('resources/images/leaderBoard.png') }}')`;
+            `url('{{ asset('/images/leaderBoard.png') }}')`;
         document.querySelector('.times-up').style.display = 'none';
         document.querySelector('.btn').style.display = 'none';
         document.querySelector('.table-container').style.display = 'block';
@@ -325,7 +322,7 @@
                 left.style.position = 'absolute';
                 left.style.right = '-72px';
                 left.style.top = '172px';
-                left.style.backgroundImage = `url('{{ Vite::asset('resources/images/right.png') }}')`;
+                left.style.backgroundImage = `url('{{ asset('/images/right.png') }}')`;
                 left.style.backgroundSize = 'contain';
                 left.style.backgroundRepeat = 'no-repeat';
                 firstTd.appendChild(left);
@@ -337,7 +334,7 @@
                 right.style.left = '-37px';
                 right.style.top = '133px';
 
-                right.style.backgroundImage = `url('{{ Vite::asset('resources/images/left.png') }}')`;
+                right.style.backgroundImage = `url('{{ asset('/images/left.png') }}')`;
                 right.style.backgroundSize = 'contain';
                 right.style.backgroundRepeat = 'no-repeat';
                 lastTd.appendChild(right);

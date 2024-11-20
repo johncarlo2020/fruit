@@ -12,10 +12,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Styles / Scripts -->
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-    @endif
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Include Phaser library -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@2.6.2/build/phaser.min.js"></script>
@@ -23,14 +20,14 @@
     <style>
         @font-face {
             font-family: 'Simonetta-Black';
-            src: url('{{ Vite::asset('resources/fonts/Simonetta-Black.ttf') }}') format('truetype');
+            src: url('/fonts/Simonetta-Black.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
         }
 
         @font-face {
             font-family: 'Singulier-Bold';
-            src: url('{{ Vite::asset('resources/fonts/Singulier-Bold.ttf') }}') format('truetype');
+            src: url('fonts/Singulier-Bold.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
         }
@@ -42,7 +39,7 @@
         .game-page {
             width: 100%;
             height: 100vh;
-            background-image: url({{ Vite::asset('resources/images/Background.webp') }});
+            background-image: url('images/Background.webp');
             background-size: cover;
             background-position: center;
             position: relative;
@@ -83,27 +80,27 @@
 
         function preload() {
             this.load.crossOrigin = 'anonymous'; // Set crossOrigin
-            this.load.text('Singulier-Bold', '{{ Vite::asset('resources/fonts/Singulier-Bold.ttf') }}');
-            this.load.text('Simonetta-Black', '{{ Vite::asset('resources/fonts/Simonetta-Black.ttf') }}');
-            this.load.audio('sliceSound', '{{ Vite::asset('resources/sounds/slice.mp3') }}');
-            this.load.audio('goodSound', '{{ Vite::asset('resources/sounds/good.mp3') }}');
-            this.load.audio('badSound', '{{ Vite::asset('resources/sounds/bad.mp3') }}');
-            this.load.audio('pop', '{{ Vite::asset('resources/sounds/pop.mp3') }}');
-            this.load.audio('special', '{{ Vite::asset('resources/sounds/success2.wav') }}');
-            this.load.audio('backgroundMusic', '{{ Vite::asset('resources/sounds/background.mp3') }}');
-            this.load.image('good1', '{{ Vite::asset('resources/images/orange.webp') }}');
-            this.load.image('good2', '{{ Vite::asset('resources/images/Pomegranate.webp') }}');
-            this.load.image('good3', '{{ Vite::asset('resources/images/Berry.webp') }}');
-            this.load.image('good4', '{{ Vite::asset('resources/images/apple.webp') }}');
-            this.load.image('good5', '{{ Vite::asset('resources/images/Fig.webp') }}'); // New object
-            this.load.image('good6', '{{ Vite::asset('resources/images/grape.webp') }}'); // New object
-            this.load.image('bad1', '{{ Vite::asset('resources/images/roetten-pear.webp') }}');
-            this.load.image('bad2', '{{ Vite::asset('resources/images/Rotten-Apple.webp') }}');
-            this.load.image('circle', '{{ Vite::asset('resources/images/circle.svg') }}');
-            this.load.image('particle', '{{ Vite::asset('resources/images/particle2.svg') }}');
-            this.load.image('sword', '{{ Vite::asset('resources/images/magicwand.webp') }}');
-            this.load.image('glitter', '{{ Vite::asset('resources/images/particle.png') }}');
-            this.load.image('berryBg', '{{ Vite::asset('resources/images/berry_effect.webp') }}');
+            this.load.text('Singulier-Bold', '{{ asset('fonts/Singulier-Bold.ttf') }}');
+            this.load.text('Simonetta-Black', '{{ asset('fonts/Simonetta-Black.ttf') }}');
+            this.load.audio('sliceSound', '{{ asset('sounds/slice.mp3') }}');
+            this.load.audio('goodSound', '{{ asset('sounds/good.mp3') }}');
+            this.load.audio('badSound', '{{ asset('sounds/bad.mp3') }}');
+            this.load.audio('pop', '{{ asset('sounds/pop.mp3') }}');
+            this.load.audio('special', '{{ asset('sounds/success2.wav') }}');
+            this.load.audio('backgroundMusic', '{{ asset('sounds/background.mp3') }}');
+            this.load.image('good1', '{{ asset('images/orange.webp') }}');
+            this.load.image('good2', '{{ asset('images/Pomegranate.webp') }}');
+            this.load.image('good3', '{{ asset('images/Berry.webp') }}');
+            this.load.image('good4', '{{ asset('images/apple.webp') }}');
+            this.load.image('good5', '{{ asset('images/Fig.webp') }}'); // New object
+            this.load.image('good6', '{{ asset('images/grape.webp') }}'); // New object
+            this.load.image('bad1', '{{ asset('images/roetten-pear.webp') }}');
+            this.load.image('bad2', '{{ asset('images/Rotten-Apple.webp') }}');
+            this.load.image('circle', '{{ asset('images/circle.svg') }}');
+            this.load.image('particle', '{{ asset('images/particle2.svg') }}');
+            this.load.image('sword', '{{ asset('images/magicwand.webp') }}');
+            this.load.image('glitter', '{{ asset('images/particle.png') }}');
+            this.load.image('berryBg', '{{ asset('images/berry_effect.webp') }}');
         }
 
         var good_objects1, good_objects2, good_objects3, good_objects4, good_objects5, good_objects6, bad_objects1,
