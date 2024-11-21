@@ -32,6 +32,7 @@
 
     body {
         font-family: 'Singulier-Bold', sans-serif;
+        overflow: hidden;
     }
 
     .name {
@@ -109,11 +110,23 @@
         position: absolute;
         width: 300px;
         height: 200px;
-        border: 1px solid #ccc;
         top: 38%;
         left: 36%;
         display: none;
         aspect-ratio: 9 / 16;
+    }
+
+    #qr-shaded-region {
+        position: absolute !important;
+        border-width: 27.5px 17px !important;
+        border-style: solid !important;
+        border-color: rgba(0, 0, 0, 0.48) !important;
+        box-sizing: border-box !important;
+        inset: 0px !important;
+    }
+
+    #reader {
+        transform: rotate(-90deg) scaleX(-1);
     }
 </style>
 
@@ -129,21 +142,15 @@
 
     </a>
 </body>
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-<script>
-    (function() {
-        const lastClear = localStorage.getItem('lastClear');
-        const today = new Date().toDateString();
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
 
-        if (lastClear !== today) {
-            localStorage.clear();
-            localStorage.setItem('lastClear', today); // Update the last clear date
-        }
-    })();
+<script>
     const audio = new Audio('{{ asset('sounds/background.mp3') }}');
     audio.loop = true;
     const countdownSound = new Audio('{{ asset('sounds/countdown.mp3') }}');
     var currentUser = null;
+    const locationId = localStorage.getItem('LocationId');
+    console.log(locationId);
 
     document.body.addEventListener('click', () => {
         audio.play();
@@ -193,7 +200,12 @@
                     facingMode: "environment"
                 }, {
                     fps: 10,
-                    qrbox: 250,
+                    qrbox: function(viewfinderWidth, viewfinderHeight) {
+                        return {
+                            width: viewfinderWidth,
+                            height: viewfinderHeight
+                        }; // Full coverage
+                    },
                     aspectRatio: 9 / 16 // Portrait orientation
                 },
                 qrCodeMessage => {

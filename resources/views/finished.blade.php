@@ -31,6 +31,7 @@
 
     body {
         font-family: 'Singulier-Bold', sans-serif;
+        overflow: hidden;
     }
 
     .name h1 {
@@ -173,7 +174,7 @@
         border-radius: 5px;
         position: absolute;
         bottom: 20%;
-        left: 50%;
+        left: 46%;
         transform: translate(-50%, -50%);
         border: none;
         cursor: pointer;
@@ -217,8 +218,8 @@
                 <tr>
                     <th>No.</th>
                     <th>Name</th>
-                    <th>Phone</th>
                     <th>Score</th>
+                    <th>Time</th>
                 </tr>
             </table>
         </div>
@@ -228,7 +229,18 @@
     </a>
 </body>
 <script>
+    document.body.addEventListener('click', function(event) {
+        const doneButton = document.getElementById('done');
+
+        // Check if the button is hidden
+        if (doneButton && getComputedStyle(doneButton).display === 'none') {
+            // Redirect to the next page
+            window.location.href = '/'; // Replace '/next-page' with your desired URL
+        }
+    });
     const today = new Date();
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
     const formattedDate = (today.getMonth() + 1).toString().padStart(2, '0') + '/' +
         today.getDate().toString().padStart(2, '0') + '/' +
         today.getFullYear();
@@ -243,79 +255,84 @@
     audio.play();
 
     const data = JSON.parse(localStorage.getItem('currentUser'));
+
     console.log(data);
     document.querySelector('.score').innerText = data.score;
     document.querySelector('.message').innerHTML = `Well done,<br>${data.name}!`;
 
 
     document.querySelector('#done').addEventListener('mouseenter', () => {
-        // Change the background image
+        // Change the background image and show/hide elements
         document.querySelector('.finish-page').style.backgroundImage =
             `url('{{ asset('/images/leaderBoard.png') }}')`;
         document.querySelector('.times-up').style.display = 'none';
         document.querySelector('.btn').style.display = 'none';
         document.querySelector('.table-container').style.display = 'block';
 
-        // Populate the leaderboard table
-        const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        // Retrieve current user data from local storage
+        const locationId = localStorage.getItem('LocationId');
 
-        let existingUserIndex = leaderboard.findIndex(user => user.id === currentUser.id);
-        console.log(existingUserIndex);
-        console.log(leaderboard);
-        if (existingUserIndex !== -1) {
-            // User exists on the leaderboard, check if the new score is higher
-            if (currentUser.score > leaderboard[existingUserIndex].score) {
-                console.log('higher');
-                // Update the score if it's higher
-                leaderboard[existingUserIndex] = {
-                    id: currentUser.id,
-                    name: currentUser.name,
-                    score: currentUser.score,
-                    phone: currentUser.phone
-                };
-            }
-        } else {
-            // User does not exist, add them to the leaderboard
-            leaderboard.push({
-                id: currentUser.id,
-                name: currentUser.name,
-                score: currentUser.score,
-                phone: currentUser.phone
+        // Make an AJAX request to save the leaderboard data
+        fetch('{{ route('leaderboard.save') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    currentUser: data,
+                    locationId: locationId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // If the response is not OK, log the error and throw an exception
+                    console.error('Error response:', response.statusText);
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Render the leaderboard
+                renderLeaderboard(data);
+            })
+            .catch(error => {
+                console.error('Errorasda:', error);
             });
-        }
 
-        // Sort leaderboard by score in ascending order
-        leaderboard.sort((a, b) => b.score - a.score);
-        leaderboard.splice(5);
+        const interval = setInterval(() => {
+            window.location.href = '{{ url('/') }}';
+        }, 10000);
+    });
 
-        // Update leaderboard in local storage
-        localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
-
-        // Get the table body element
+    function renderLeaderboard(leaderboard) {
         const tableBody = document.querySelector('.table tbody');
-
-        // Clear existing rows if any
-        tableBody.innerHTML = '';
-
-        // Loop through each item in the leaderboard and add rows to the table
         leaderboard.forEach((user, index) => {
-            // Create a new row and add columns with user data
             const row = document.createElement('tr');
-            const last4Digits = user.phone.slice(-4);
-            row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${user.name}</td>
-                 <td>${last4Digits}</td>
-                <td>${user.score}</td>
-            `;
+            const last4Digits = user.phone;
 
-            // Add a highlight class for the current user
-            if (user.id === data.id) {
+            const updatedAt = new Date(user.updated_at);
+            const formattedDate = updatedAt.toLocaleString('en-US', {
+
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+
+            row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${user.name}</td>
+            <td>${user.score}</td>
+            <td>${formattedDate}</td>
+
+        `;
+
+            if (user.code === currentUser.id) {
                 row.classList.add('user');
-                // create div inside first td and last td
                 const firstTd = row.querySelector('td:first-child');
                 const lastTd = row.querySelector('td:last-child');
+
                 const left = document.createElement('div');
                 left.style.width = '100px';
                 left.style.height = '100px';
@@ -333,22 +350,15 @@
                 right.style.position = 'absolute';
                 right.style.left = '-37px';
                 right.style.top = '133px';
-
                 right.style.backgroundImage = `url('{{ asset('/images/left.png') }}')`;
                 right.style.backgroundSize = 'contain';
                 right.style.backgroundRepeat = 'no-repeat';
                 lastTd.appendChild(right);
             }
 
-            // Append the row to the table body
             tableBody.appendChild(row);
         });
-
-        const interval = setInterval(() => {
-            window.location.href = '{{ url('/') }}';
-
-        }, 10000);
-    });
+    }
 </script>
 
 

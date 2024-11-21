@@ -34,6 +34,7 @@
 
         body {
             font-family: 'Singulier-Bold', sans-serif;
+            overflow: hidden;
         }
 
         .game-page {
@@ -148,7 +149,7 @@
             slashes = game.add.graphics(0, 0);
 
             // Create timer label on the left side
-            const timeTextLabel = game.add.text(10, 10, 'TIME', {
+            const timeTextLabel = game.add.text(40, 10, 'TIME', {
                 fontFamily: 'Singulier-Bold',
                 fontSize: '32px',
                 fontWeight: 'bold',
@@ -156,7 +157,7 @@
             });
 
             // Create timer value label below the "Time" label
-            timerLabel = game.add.text(35, 10 + timeTextLabel.height, '00', {
+            timerLabel = game.add.text(75, 10 + timeTextLabel.height, '00', {
                 fontFamily: 'Singulier-Bold',
                 fontSize: '32px',
                 fontWeight: 'bold',
@@ -185,7 +186,7 @@
 
             highscoreLabel.anchor.set(0.5, 0);
 
-            const scoreLabelText = game.add.text(game.world.width - 120, 10, 'SCORE', {
+            const scoreLabelText = game.add.text(game.world.width - 150, 10, 'SCORE', {
                 fontFamily: 'Singulier-Bold',
                 fontSize: '32px',
                 fontWeight: 'bold',
@@ -193,14 +194,14 @@
             });
 
             // Create score label initially on the right side
-            scoreLabel = game.add.text(game.world.width - 100, 10 + scoreLabelText.height, '0', {
+            scoreLabel = game.add.text(game.world.width - 150, 10 + scoreLabelText.height, '0', {
                 fontFamily: 'Singulier-Bold',
                 fontSize: '32px',
                 fontWeight: 'bold',
                 color: '#000'
             });
             scoreLabel.anchor.set(1, 0);
-            scoreLabel.x = game.world.width - 20;
+            scoreLabel.x = game.world.width - 50;
 
 
             // Create particle emitter
