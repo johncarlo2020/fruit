@@ -326,369 +326,136 @@
         var good3Counter = 0; // Counter for good3 objects
         var maxGood3Count = 9;
 
-            function throwObject() {
-                if (!continueThrowing) return; // Stop throwing objects if the flag is false
+        function throwObject() {
+            if (!continueThrowing) return; // Stop throwing objects if the flag is false
 
-                elapsedTime += game.time.elapsed; // Update elapsed time
+            elapsedTime += game.time.elapsed; // Update elapsed time
 
-                // Adjust fireRate based on elapsed time
-                var adjustedFireRate = fireRate - Math.floor(elapsedTime / 10000) * 500;
-                adjustedFireRate = Math.max(adjustedFireRate, 500);
+            // Adjust fireRate based on elapsed time
+            var adjustedFireRate = fireRate - Math.floor(elapsedTime / 10000) * 500;
+            adjustedFireRate = Math.max(adjustedFireRate, 500);
 
-                var badObjectProbability = 0.4 + Math.min(elapsedTime / 60000, 0.4); // Increase bad object probability over time
+            var badObjectProbability = 0.4 + Math.min(elapsedTime / 60000,
+            0.4); // Increase bad object probability over time
 
-                if (game.time.now > nextFire) {
-                    // Check if there are any items on the screen
-                    var itemsOnScreen = good_objects1.countLiving() + good_objects2.countLiving() + good_objects3.countLiving() +
-                                        good_objects4.countLiving() + good_objects5.countLiving() + good_objects6.countLiving() +
-                                        bad_objects1.countLiving() + bad_objects2.countLiving();
+            if (game.time.now > nextFire) {
+                // Check if there are any items on the screen
+                var itemsOnScreen = good_objects1.countLiving() + good_objects2.countLiving() + good_objects3
+                .countLiving() +
+                    good_objects4.countLiving() + good_objects5.countLiving() + good_objects6.countLiving() +
+                    bad_objects1.countLiving() + bad_objects2.countLiving();
 
-                    if (itemsOnScreen > 0) {
-                        // If there are items on the screen, just increase the speed of the next throw
-                        nextFire = game.time.now + adjustedFireRate;
-                        return;
-                    }
-
+                if (itemsOnScreen > 0) {
+                    // If there are items on the screen, just increase the speed of the next throw
                     nextFire = game.time.now + adjustedFireRate;
-
-                    // Determine the number of objects to throw
-                    var numObjectsToThrow;
-                    if (elapsedTime < 5000) {
-                        numObjectsToThrow = isFirstThrow ? 1 : Math.floor(Math.random() * 5) + 3; // 3-7 objects in the first 10 seconds
-                    } else {
-                        numObjectsToThrow = Math.floor(Math.random() * 6) + 3; // 3-8 objects after 10 seconds
-                    }
-                    isFirstThrow = false; // Reset the first throw flag after the first throw
-
-                    var good3Thrown = false; // Track if a good3 object has been thrown
-
-                    // Define a central point for the clump within the central 50% of the screen width
-                    var clumpCenterX = game.world.width * 0.25 + Math.random() * game.world.width * 0.5;
-                    var clumpCenterY = game.world.height - 10;
-
-                    for (var i = 0; i < numObjectsToThrow; i++) {
-                        var randomGoodObjectGroup;
-                        do {
-                            randomGoodObjectGroup = Math.floor(Math.random() * 6) + 1;
-                        } while (randomGoodObjectGroup === 3 && (good3Thrown || good3Counter >= maxGood3Count));
-
-                        if (randomGoodObjectGroup === 3) {
-                            good3Counter++;
-                            good3Thrown = true; // Mark that a good3 object has been thrown
-                        }
-
-                        throwGoodObject(eval('good_objects' + randomGoodObjectGroup), clumpCenterX, clumpCenterY, i);
-                    }
-
-                    if (Math.random() < badObjectProbability) {
-                        throwBadObject(bad_objects1, clumpCenterX, clumpCenterY, numObjectsToThrow);
-                    }
-
-                    if (Math.random() < badObjectProbability) {
-                        throwBadObject(bad_objects2, clumpCenterX, clumpCenterY, numObjectsToThrow);
-                    }
-                }
-            }
-
-            function throwGoodObject(group, clumpCenterX, clumpCenterY, index) {
-                var obj = group.getFirstDead();
-
-                // Random position within a smaller range around the clump center
-                var randomX = clumpCenterX + (Math.random() * 100 - 50);
-                var startY = clumpCenterY;
-
-                // Set object position at random x and bottom y
-                obj.reset(randomX, startY);
-                obj.anchor.setTo(0.5, 0.5);
-
-                // Move towards a random target within the top part of the screen
-                var targetX = clumpCenterX + (Math.random() * 100 - 50) + index * 10; // Gradually increase separation
-                var targetY = Math.random() * (game.world.centerY - Math.random() * 100);
-
-                // Base speed and gravity
-                var baseSpeed = 800;
-                var baseGravity = 150;
-
-                // Increase falling speed and gravity as time progresses
-                var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 10;
-                var gravity = baseGravity + Math.floor(elapsedTime / 5000) * 10;
-
-                // Additional speed and gravity for good6 objects
-                if (obj.key === 'good3') {
-                    speed += 100;
-                    gravity += 200;
+                    return;
                 }
 
-                game.physics.arcade.moveToXY(obj, targetX, targetY, speed);
-                obj.body.gravity.y = gravity;
-            }
+                nextFire = game.time.now + adjustedFireRate;
 
-            function throwBadObject(group, clumpCenterX, clumpCenterY, index) {
-                var obj = group.getFirstDead();
-
-                // Random position within a smaller range around the clump center
-                var randomX = clumpCenterX + (Math.random() * 100 - 50);
-                var startY = clumpCenterY;
-
-                // Set object position at random x and bottom y
-                obj.reset(randomX, startY);
-                obj.anchor.setTo(0.5, 0.5);
-
-                // Move towards a random target within the top part of the screen
-                var targetX = clumpCenterX + (Math.random() * 100 - 50) + index * 10; // Gradually increase separation
-                var targetY = Math.random() * (game.world.centerY - Math.random() * 100);
-
-                // Increase falling speed as time progresses
-                var speed = 700 + Math.floor(elapsedTime / 10000) * 10; // Increase speed every 10 seconds
-                game.physics.arcade.moveToXY(obj, targetX, targetY, speed);
-
-                // Increase gravity as time progresses
-                var gravity = 200 + Math.floor(elapsedTime / 10000) * 10; // Increase gravity every 10 seconds
-                obj.body.gravity.y = gravity;
-            }function throwObject() {
-                if (!continueThrowing) return; // Stop throwing objects if the flag is false
-
-                elapsedTime += game.time.elapsed; // Update elapsed time
-
-                // Adjust fireRate based on elapsed time
-                var adjustedFireRate = fireRate - Math.floor(elapsedTime / 10000) * 200;
-                adjustedFireRate = Math.max(adjustedFireRate, 500);
-
-                var badObjectProbability = 0.3 + Math.min(elapsedTime / 60000, 0.4); // Increase bad object probability over time
-
-                if (game.time.now > nextFire) {
-                    // Check if there are any items on the screen
-                    var itemsOnScreen = good_objects1.countLiving() + good_objects2.countLiving() + good_objects3.countLiving() +
-                                        good_objects4.countLiving() + good_objects5.countLiving() + good_objects6.countLiving() +
-                                        bad_objects1.countLiving() + bad_objects2.countLiving();
-
-                    if (itemsOnScreen > 0) {
-                        // If there are items on the screen, just increase the speed of the next throw
-                        nextFire = game.time.now + adjustedFireRate;
-                        return;
-                    }
-
-                    nextFire = game.time.now + adjustedFireRate;
-
-                    // Determine the number of objects to throw
-                    var numObjectsToThrow;
-                    if (elapsedTime < 5000) {
-                        numObjectsToThrow = isFirstThrow ? 1 : Math.floor(Math.random() * 5) + 3; // 3-7 objects in the first 10 seconds
-                    } else {
-                        numObjectsToThrow = Math.floor(Math.random() * 6) + 3; // 3-8 objects after 10 seconds
-                    }
-                    isFirstThrow = false; // Reset the first throw flag after the first throw
-
-                    var good3Thrown = false; // Track if a good3 object has been thrown
-
-                    // Define a central point for the clump
-                    var clumpCenterX = Math.random() * game.world.width;
-                    var clumpCenterY = game.world.height - 10;
-
-                    for (var i = 0; i < numObjectsToThrow; i++) {
-                        var randomGoodObjectGroup;
-                        do {
-                            randomGoodObjectGroup = Math.floor(Math.random() * 6) + 1;
-                        } while (randomGoodObjectGroup === 3 && (good3Thrown || good3Counter >= maxGood3Count));
-
-                        if (randomGoodObjectGroup === 3) {
-                            good3Counter++;
-                            good3Thrown = true; // Mark that a good3 object has been thrown
-                        }
-
-                        throwGoodObject(eval('good_objects' + randomGoodObjectGroup), clumpCenterX, clumpCenterY);
-                    }
-
-                    if (Math.random() < badObjectProbability) {
-                        throwBadObject(bad_objects1, clumpCenterX, clumpCenterY);
-                    }
-
-                    if (Math.random() < badObjectProbability) {
-                        throwBadObject(bad_objects2, clumpCenterX, clumpCenterY);
-                    }
+                // Determine the number of objects to throw
+                var numObjectsToThrow;
+                if (elapsedTime < 5000) {
+                    numObjectsToThrow = isFirstThrow ? 1 : Math.floor(Math.random() * 5) +
+                    3; // 3-7 objects in the first 10 seconds
+                } else {
+                    numObjectsToThrow = Math.floor(Math.random() * 6) + 3; // 3-8 objects after 10 seconds
                 }
-            }
+                isFirstThrow = false; // Reset the first throw flag after the first throw
 
-            function throwGoodObject(group, clumpCenterX, clumpCenterY) {
-                var obj = group.getFirstDead();
+                var good3Thrown = false; // Track if a good3 object has been thrown
 
-                // Random position within a smaller range around the clump center
-                var randomX = clumpCenterX + (Math.random() * 100 - 50);
-                var startY = clumpCenterY;
+                // Define a central point for the clump at the center of the screen
+                var clumpCenterX = game.world.centerX;
+                var clumpCenterY = game.world.height - 10;
 
-                // Set object position at random x and bottom y
-                obj.reset(randomX, startY);
-                obj.anchor.setTo(0.5, 0.5);
+                for (var i = 0; i < numObjectsToThrow; i++) {
+                    var randomGoodObjectGroup;
+                    do {
+                        randomGoodObjectGroup = Math.floor(Math.random() * 6) + 1;
+                    } while (randomGoodObjectGroup === 3 && (good3Thrown || good3Counter >= maxGood3Count));
 
-                // Move towards a random target within the top part of the screen
-                var targetX = clumpCenterX + (Math.random() * 100 - 50);
-                var targetY = Math.random() * (game.world.centerY - Math.random() * 100);
+                    if (randomGoodObjectGroup === 3) {
+                        good3Counter++;
+                        good3Thrown = true; // Mark that a good3 object has been thrown
+                    }
 
-                // Base speed and gravity
-                var baseSpeed = 800;
-                var baseGravity = 150;
-
-                // Increase falling speed and gravity as time progresses
-                var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 10;
-                var gravity = baseGravity + Math.floor(elapsedTime / 5000) * 10;
-
-                // Additional speed and gravity for good6 objects
-                if (obj.key === 'good3') {
-                    speed += 100;
-                    gravity += 200;
+                    throwGoodObject(eval('good_objects' + randomGoodObjectGroup), clumpCenterX, clumpCenterY, i);
                 }
 
-                game.physics.arcade.moveToXY(obj, targetX, targetY, speed);
-                obj.body.gravity.y = gravity;
+                if (Math.random() < badObjectProbability) {
+                    throwBadObject(bad_objects1, clumpCenterX, clumpCenterY, numObjectsToThrow);
+                }
+
+                if (Math.random() < badObjectProbability) {
+                    throwBadObject(bad_objects2, clumpCenterX, clumpCenterY, numObjectsToThrow);
+                }
+            }
+        }
+
+        function throwGoodObject(group, clumpCenterX, clumpCenterY, index) {
+            var obj = group.getFirstDead();
+
+            // Random position within a smaller range around the clump center
+            var randomX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 100 - 50), 0, game.world.width - obj.width);
+            var startY = clumpCenterY;
+
+            // Set object position at random x and bottom y
+            obj.reset(randomX, startY);
+            obj.anchor.setTo(0.5, 0.5);
+
+            // Move towards a random target within the top part of the screen
+            var targetX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 100 - 50) + index * 80, 0, game.world.width -
+                obj.width);
+            var targetY = Math.random() * (game.world.centerY - Math.random() * 100);
+
+            // Base speed and gravity
+            var baseSpeed = 800;
+            var baseGravity = 150;
+
+            // Increase falling speed and gravity as time progresses
+            var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 10;
+            var gravity = baseGravity + Math.floor(elapsedTime / 5000) * 10;
+
+            // Additional speed and gravity for good6 objects
+            if (obj.key === 'good3') {
+                speed += 100;
+                gravity += 200;
             }
 
-            function throwBadObject(group, clumpCenterX, clumpCenterY) {
-                var obj = group.getFirstDead();
+            game.physics.arcade.moveToXY(obj, targetX, targetY, speed);
+            obj.body.gravity.y = gravity;
+        }
 
-                // Random position within a smaller range around the clump center
-                var randomX = clumpCenterX + (Math.random() * 100 - 50);
-                var startY = clumpCenterY;
+        function throwBadObject(group, clumpCenterX, clumpCenterY, index) {
+            var obj = group.getFirstDead();
 
-                // Set object position at random x and bottom y
-                obj.reset(randomX, startY);
-                obj.anchor.setTo(0.5, 0.5);
+            // Random position within a smaller range around the clump center
+            var randomX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 100 - 50), 0, game.world.width - obj.width);
+            var startY = clumpCenterY;
 
-                // Move towards a random target within the top part of the screen
-                var targetX = clumpCenterX + (Math.random() * 100 - 50);
-                var targetY = Math.random() * (game.world.centerY - Math.random() * 100);
+            // Set object position at random x and bottom y
+            obj.reset(randomX, startY);
+            obj.anchor.setTo(0.5, 0.5);
 
-                // Increase falling speed as time progresses
-                var speed = 700 + Math.floor(elapsedTime / 10000) * 10; // Increase speed every 10 seconds
-                game.physics.arcade.moveToXY(obj, targetX, targetY, speed);
+            // Move towards a random target within the top part of the screen
+            var targetX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 100 - 50) + index * 80, 0, game.world.width -
+                obj.width);
+            var targetY = Math.random() * (game.world.centerY - Math.random() * 100);
 
-                // Increase gravity as time progresses
-                var gravity = 200 + Math.floor(elapsedTime / 10000) * 10; // Increase gravity every 10 seconds
-                obj.body.gravity.y = gravity;
-            }
+            // Increase falling speed as time progresses
+            var speed = 900 + Math.floor(elapsedTime / 10000) * 10; // Increase speed every 10 seconds
+            game.physics.arcade.moveToXY(obj, targetX, targetY, speed);
+
+            // Increase gravity as time progresses
+            var gravity = 300 + Math.floor(elapsedTime / 10000) * 10; // Increase gravity every 10 seconds
+            obj.body.gravity.y = gravity;
+        }
 
 
 
         function update() {
-            throwObject();            function throwObject() {
-                if (!continueThrowing) return; // Stop throwing objects if the flag is false
-
-                elapsedTime += game.time.elapsed; // Update elapsed time
-
-                // Adjust fireRate based on elapsed time
-                var adjustedFireRate = fireRate - Math.floor(elapsedTime / 10000) * 500;
-                adjustedFireRate = Math.max(adjustedFireRate, 500);
-
-                var badObjectProbability = 0.4 + Math.min(elapsedTime / 60000, 0.4); // Increase bad object probability over time
-
-                if (game.time.now > nextFire) {
-                    // Check if there are any items on the screen
-                    var itemsOnScreen = good_objects1.countLiving() + good_objects2.countLiving() + good_objects3.countLiving() +
-                                        good_objects4.countLiving() + good_objects5.countLiving() + good_objects6.countLiving() +
-                                        bad_objects1.countLiving() + bad_objects2.countLiving();
-
-                    if (itemsOnScreen > 0) {
-                        // If there are items on the screen, just increase the speed of the next throw
-                        nextFire = game.time.now + adjustedFireRate;
-                        return;
-                    }
-
-                    nextFire = game.time.now + adjustedFireRate;
-
-                    // Determine the number of objects to throw
-                    var numObjectsToThrow;
-                    if (elapsedTime < 5000) {
-                        numObjectsToThrow = isFirstThrow ? 1 : Math.floor(Math.random() * 5) + 3; // 3-7 objects in the first 10 seconds
-                    } else {
-                        numObjectsToThrow = Math.floor(Math.random() * 6) + 3; // 3-8 objects after 10 seconds
-                    }
-                    isFirstThrow = false; // Reset the first throw flag after the first throw
-
-                    var good3Thrown = false; // Track if a good3 object has been thrown
-
-                    // Define a central point for the clump
-                    var clumpCenterX = Math.random() * game.world.width;
-                    var clumpCenterY = game.world.height - 10;
-
-                    for (var i = 0; i < numObjectsToThrow; i++) {
-                        var randomGoodObjectGroup;
-                        do {
-                            randomGoodObjectGroup = Math.floor(Math.random() * 6) + 1;
-                        } while (randomGoodObjectGroup === 3 && (good3Thrown || good3Counter >= maxGood3Count));
-
-                        if (randomGoodObjectGroup === 3) {
-                            good3Counter++;
-                            good3Thrown = true; // Mark that a good3 object has been thrown
-                        }
-
-                        throwGoodObject(eval('good_objects' + randomGoodObjectGroup), clumpCenterX, clumpCenterY, i);
-                    }
-
-                    if (Math.random() < badObjectProbability) {
-                        throwBadObject(bad_objects1, clumpCenterX, clumpCenterY, numObjectsToThrow);
-                    }
-
-                    if (Math.random() < badObjectProbability) {
-                        throwBadObject(bad_objects2, clumpCenterX, clumpCenterY, numObjectsToThrow);
-                    }
-                }
-            }
-
-            function throwGoodObject(group, clumpCenterX, clumpCenterY, index) {
-                var obj = group.getFirstDead();
-
-                // Random position within a smaller range around the clump center
-                var randomX = clumpCenterX + (Math.random() * 100 - 50);
-                var startY = clumpCenterY;
-
-                // Set object position at random x and bottom y
-                obj.reset(randomX, startY);
-                obj.anchor.setTo(0.5, 0.5);
-
-                // Move towards a random target within the top part of the screen
-                var targetX = clumpCenterX + (Math.random() * 100 - 50) + index * 100; // Gradually increase separation
-                var targetY = Math.random() * (game.world.centerY - Math.random() * 100);
-
-                // Base speed and gravity
-                var baseSpeed = 800;
-                var baseGravity = 150;
-
-                // Increase falling speed and gravity as time progresses
-                var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 10;
-                var gravity = baseGravity + Math.floor(elapsedTime / 5000) * 10;
-
-                // Additional speed and gravity for good6 objects
-                if (obj.key === 'good3') {
-                    speed += 100;
-                    gravity += 200;
-                }
-
-                game.physics.arcade.moveToXY(obj, targetX, targetY, speed);
-                obj.body.gravity.y = gravity;
-            }
-
-            function throwBadObject(group, clumpCenterX, clumpCenterY, index) {
-                var obj = group.getFirstDead();
-
-                // Random position within a smaller range around the clump center
-                var randomX = clumpCenterX + (Math.random() * 100 - 50);
-                var startY = clumpCenterY;
-
-                // Set object position at random x and bottom y
-                obj.reset(randomX, startY);
-                obj.anchor.setTo(0.5, 0.5);
-
-                // Move towards a random target within the top part of the screen
-                var targetX = clumpCenterX + (Math.random() * 100 - 50) + index * 100; // Gradually increase separation
-                var targetY = Math.random() * (game.world.centerY - Math.random() * 100);
-
-                // Increase falling speed as time progresses
-                var speed = 700 + Math.floor(elapsedTime / 10000) * 10; // Increase speed every 10 seconds
-                game.physics.arcade.moveToXY(obj, targetX, targetY, speed);
-
-                // Increase gravity as time progresses
-                var gravity = 200 + Math.floor(elapsedTime / 10000) * 10; // Increase gravity every 10 seconds
-                obj.body.gravity.y = gravity;
-            }
+            throwObject();
 
             points.push({
                 x: game.input.x,
