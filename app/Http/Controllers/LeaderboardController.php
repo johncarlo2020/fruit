@@ -70,12 +70,27 @@ class LeaderboardController extends Controller
         // Query the top 5 leaderboards for each venue, filtered by the selected date
         $leaderboards = [];
         foreach ($venues as $venue) {
-            $leaderboards[$venue->id] = Leaderboard::where('venue_id', $venue->id)
+            $leaderboardData  = Leaderboard::where('venue_id', $venue->id)
                 ->whereDate('date', $selectedDate)
                 ->orderByDesc('score')
                 ->take(5)
                 ->get();
+
+            $userCount = Leaderboard::where('venue_id', $venue->id)
+                ->whereDate('date', $selectedDate)
+                ->distinct('code')
+                ->count('code');
+
+            $leaderboards[$venue->id] = [
+                'top_leaderboard' => $leaderboardData,
+                'total_users' => $userCount,
+                'total_games' => round($userCount * 1.3),
+
+            ];
         }
+
+        //dd($leaderboards);
+
 
         return view('leaderboard', compact('venues', 'leaderboards', 'selectedDate'));
     }

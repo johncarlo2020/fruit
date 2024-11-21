@@ -83,7 +83,10 @@
     <div class="venues">
         @foreach ($venues as $venue)
             <div class="table-container">
-                <h3>Venue: {{ $venue->name }}</h3>
+                <h1>Venue: {{ $venue->name }}</h1>
+                <h3> Total Users : {{ $leaderboards[$venue->id]['total_users'] }}</h3>
+                <h3> Total Games Played : {{ $leaderboards[$venue->id]['total_games'] }}</h3>
+
                 <button class="btn btn-success" onclick="exportToExcel('table-{{ $venue->id }}')">Export to
                     Excel</button>
                 <div class="table-responsive">
@@ -98,7 +101,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($leaderboards[$venue->id] as $index => $leaderboard)
+                            @foreach ($leaderboards[$venue->id]['top_leaderboard'] as $index => $leaderboard)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $leaderboard->name }}</td>
