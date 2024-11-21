@@ -15,43 +15,37 @@ class LeaderboardController extends Controller
         $today = now()->toDateString();
 
         // Find the existing user on the leaderboard for today
-        $user = Leaderboard::where('code', $request['currentUser']['id'])
-            ->where('venue_id', $request['locationId'])
-            ->where('date', $today) // Ensure the record is for today
-            ->first();
 
-        if ($user) {
-            // Check if the current score is higher than the previous score for today
-            if ($request['currentUser']['score'] > $user->score) {
-                // Update the user with the new score
-                $user->update([
-                    'name' => $request['currentUser']['name'],
-                    'code' => $request['currentUser']['id'],
-                    'email' => $request['currentUser']['email'],
-                    'phone' => substr($request['currentUser']['phone'], -4),
-                    'score' => $request['currentUser']['score'],
-                    'venue_id' => $request['locationId'], // Assuming 'venue_id' corresponds to 'location_id'
-                ]);
-            }
-        } else {
-            // If the user doesn't exist, create a new leaderboard entry for today
-            Leaderboard::create([
-                'name' => $request['currentUser']['name'],
-                'code' => $request['currentUser']['id'],
-                'email' => $request['currentUser']['email'],
-                'phone' => substr($request['currentUser']['phone'], -4),
-                'score' => $request['currentUser']['score'],
-                'venue_id' => $request['locationId'], // Assuming 'venue_id' corresponds to 'location_id'
-                'date' => $today, // Save the current date
-            ]);
-        }
+        // If the user doesn't exist, create a new leaderboard entry for today
+        Leaderboard::create([
+            'name' => $request['currentUser']['name'],
+            'code' => $request['currentUser']['id'],
+            'email' => $request['currentUser']['email'],
+            'phone' => substr($request['currentUser']['phone'], -4),
+            'score' => $request['currentUser']['score'],
+            'venue_id' => $request['locationId'], // Assuming 'venue_id' corresponds to 'location_id'
+            'date' => $today, // Save the current date
+        ]);
+
 
         // Fetch the top 5 leaderboard entries for today, sorted by score in descending order
-        $leaderboard = Leaderboard::where('date', $today)
-            ->where('venue_id', $request['locationId']) // Filter by location_id
-            ->orderBy('score', 'desc')
-            ->take(5)
+        $leaderboard = Leaderboard::select(
+            'code',
+            Leaderboard::raw('MAX(name) as name'), // Include name
+            Leaderboard::raw('MAX(email) as email'), // Include email
+            Leaderboard::raw('MAX(phone) as phone'), // Include phone
+            Leaderboard::raw('MAX(venue_id) as venue_id'), // Include venue_id
+            Leaderboard::raw('MAX(updated_at) as updated_at'), // Select the most recent update
+            Leaderboard::raw('MAX(score) as highest_score') // Select the highest score
+        )
+            ->where('date', $today)
+            ->where('venue_id', $request['locationId']) // Filter by venue_id
+            ->groupBy('code') // Group only by code
+            ->orderBy('highest_score', 'desc') // Order by highest score
+            ->take(5) // Limit to top 5
             ->get();
+
+
 
         // Return the updated leaderboard as JSON
         return response()->json($leaderboard);
@@ -70,21 +64,35 @@ class LeaderboardController extends Controller
         // Query the top 5 leaderboards for each venue, filtered by the selected date
         $leaderboards = [];
         foreach ($venues as $venue) {
-            $leaderboardData  = Leaderboard::where('venue_id', $venue->id)
+
+            $leaderboardData = Leaderboard::select(
+                'code',
+                Leaderboard::raw('MAX(name) as name'), // Include name
+                Leaderboard::raw('MAX(email) as email'), // Include email
+                Leaderboard::raw('MAX(phone) as phone'), // Include phone
+                Leaderboard::raw('MAX(venue_id) as venue_id'), // Include venue_id
+                Leaderboard::raw('MAX(updated_at) as updated_at'), // Select the most recent update
+                Leaderboard::raw('MAX(score) as score') // Select the highest score
+            )
                 ->whereDate('date', $selectedDate)
-                ->orderByDesc('score')
-                ->take(5)
+                ->where('venue_id', $venue->id) // Filter by venue_id
+                ->groupBy('code') // Group only by code
+                ->orderBy('score', 'desc') // Order by highest score
+                ->take(5) // Limit to top 5
                 ->get();
 
             $userCount = Leaderboard::where('venue_id', $venue->id)
                 ->whereDate('date', $selectedDate)
                 ->distinct('code')
                 ->count('code');
+            $gameCount = Leaderboard::where('venue_id', $venue->id)
+                ->whereDate('date', $selectedDate)
+                ->count('code');
 
             $leaderboards[$venue->id] = [
                 'top_leaderboard' => $leaderboardData,
                 'total_users' => $userCount,
-                'total_games' => round($userCount * 1.3),
+                'total_games' => $gameCount,
 
             ];
         }

@@ -116,14 +116,6 @@
         aspect-ratio: 9 / 16;
     }
 
-    #qr-shaded-region {
-        position: absolute !important;
-        border-width: 27.5px 17px !important;
-        border-style: solid !important;
-        border-color: rgba(0, 0, 0, 0.48) !important;
-        box-sizing: border-box !important;
-        inset: 0px !important;
-    }
 
     #reader {
         transform: rotate(-90deg) scaleX(-1);

@@ -293,6 +293,7 @@
                 return response.json();
             })
             .then(data => {
+                console.log(data);
                 // Render the leaderboard
                 renderLeaderboard(data);
             })
@@ -323,7 +324,7 @@
             row.innerHTML = `
             <td>${index + 1}</td>
             <td>${user.name}</td>
-            <td>${user.score}</td>
+            <td>${user.highest_score}</td>
             <td>${formattedDate}</td>
 
         `;
