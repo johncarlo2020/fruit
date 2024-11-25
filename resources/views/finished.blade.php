@@ -229,7 +229,7 @@
     </a>
 </body>
 <script>
-    document.body.addEventListener('click', function(event) {
+    document.querySelector('#current-date').addEventListener('click', () => {
         const doneButton = document.getElementById('done');
 
         // Check if the button is hidden
@@ -256,7 +256,6 @@
 
     const data = JSON.parse(localStorage.getItem('currentUser'));
 
-    console.log(data);
     document.querySelector('.score').innerText = data.score;
     document.querySelector('.message').innerHTML = `Well done,<br>${data.name}!`;
 
@@ -293,7 +292,7 @@
                 return response.json();
             })
             .then(data => {
-                console.log(data);
+
                 // Render the leaderboard
                 renderLeaderboard(data);
             })
@@ -311,6 +310,10 @@
         leaderboard.forEach((user, index) => {
             const row = document.createElement('tr');
             const last4Digits = user.phone;
+
+            if (index == 0) {
+                localStorage.setItem('highscore', JSON.stringify(user));
+            }
 
             const updatedAt = new Date(user.updated_at);
             const formattedDate = updatedAt.toLocaleString('en-US', {

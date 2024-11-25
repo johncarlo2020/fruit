@@ -72,13 +72,13 @@ class LeaderboardController extends Controller
                 Leaderboard::raw('MAX(phone) as phone'), // Include phone
                 Leaderboard::raw('MAX(venue_id) as venue_id'), // Include venue_id
                 Leaderboard::raw('MAX(updated_at) as updated_at'), // Select the most recent update
-                Leaderboard::raw('MAX(score) as score') // Select the highest score
+                Leaderboard::raw('MAX(score) as score'),
+                Leaderboard::raw('COUNT(*) as play_count')  // Select the highest score
             )
                 ->whereDate('date', $selectedDate)
                 ->where('venue_id', $venue->id) // Filter by venue_id
                 ->groupBy('code') // Group only by code
                 ->orderBy('score', 'desc') // Order by highest score
-                ->take(5) // Limit to top 5
                 ->get();
 
             $userCount = Leaderboard::where('venue_id', $venue->id)
@@ -98,8 +98,6 @@ class LeaderboardController extends Controller
         }
 
         //dd($leaderboards);
-
-
         return view('leaderboard', compact('venues', 'leaderboards', 'selectedDate'));
     }
 

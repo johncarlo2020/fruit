@@ -89,14 +89,16 @@
 
                 <button class="btn btn-success" onclick="exportToExcel('table-{{ $venue->id }}')">Export to
                     Excel</button>
+
                 <div class="table-responsive">
-                    <table class="table table-bordered" id="table-{{ $venue->id }}">
+                    <table class="table table-bordered datatable" id="table-{{ $venue->id }}">
                         <thead>
                             <tr>
                                 <th>Rank</th>
                                 <th>Name</th>
                                 <th>Unique Id</th>
                                 <th>Score</th>
+                                <th>Games Played</th>
                                 <th>Date</th>
                             </tr>
                         </thead>
@@ -106,8 +108,9 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $leaderboard->name }}</td>
                                     <td>{{ $leaderboard->code }}</td>
-
                                     <td>{{ $leaderboard->score }}</td>
+                                    <td>{{ $leaderboard->play_count }}</td>
+
                                     <td>{{ $leaderboard->updated_at }}</td>
                                 </tr>
                             @endforeach
@@ -117,6 +120,12 @@
             </div>
         @endforeach
     </div>
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
         function exportToExcel(tableId) {
