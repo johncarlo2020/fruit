@@ -341,20 +341,21 @@
 
             if (game.time.now > nextFire) {
                 // Check if there are any items on the screen
-                var itemsOnScreen = good_objects1.countLiving() + good_objects2.countLiving() + good_objects3.countLiving() +
+                var itemsOnScreen = good_objects1.countLiving() + good_objects2.countLiving() + good_objects3
+                    .countLiving() +
                     good_objects4.countLiving() + good_objects5.countLiving() + good_objects6.countLiving() +
                     bad_objects1.countLiving() + bad_objects2.countLiving();
 
-                if (itemsOnScreen > 0) {
-                    // If there are items on the screen, just increase the speed of the next throw
-                    nextFire = game.time.now + adjustedFireRate;
-                    return;
-                }
+                // if (itemsOnScreen > 0) {
+                //     // If there are items on the screen, just increase the speed of the next throw
+                //     nextFire = game.time.now + adjustedFireRate;
+                //     return;
+                // }
 
                 nextFire = game.time.now + adjustedFireRate;
 
                 // Determine the number of objects to throw (between 4 and 6)
-                var numObjectsToThrow = Math.min(6, Math.floor(Math.random() * 3) + 4);  // Random number between 4 and 6
+                var numObjectsToThrow = Math.min(6, Math.floor(Math.random() * 3) + 4); // Random number between 4 and 6
 
                 var good3Thrown = false;
 
@@ -391,10 +392,14 @@
                     // Alternate between the two directions
                     var direction = directions[i % 2];
 
-                    throwGoodObject(eval('good_objects' + randomGoodObjectGroup), finalPositionX, clumpCenterY, i, direction);
+                    throwGoodObject(eval('good_objects' + randomGoodObjectGroup), finalPositionX, clumpCenterY, i,
+                        direction);
 
                     // Track that a good object has been thrown
-                    goodObjectsThrown.push({ group: randomGoodObjectGroup, direction: direction });
+                    goodObjectsThrown.push({
+                        group: randomGoodObjectGroup,
+                        direction: direction
+                    });
                 }
 
                 // Throw bad objects after good objects
@@ -437,8 +442,8 @@
             obj.reset(startX, startY);
             obj.anchor.setTo(0.5, 0.5);
 
-            var baseSpeed = 900;
-            var baseGravity = 120;
+            var baseSpeed = 1900;
+            var baseGravity = 1120;
 
             // Adjust speed and gravity based on elapsed time
             var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 20;
@@ -468,7 +473,8 @@
                 setTimeout(() => {
                     obj.body.gravity.y = gravity; // Apply gravity after delay
                     obj.body.velocity.setTo(
-                        direction === 'left' ? -speed + spreadX : speed + spreadX, // Adjust for opposite horizontal movement
+                        direction === 'left' ? -speed + spreadX : speed +
+                        spreadX, // Adjust for opposite horizontal movement
                         -speed * 0.8 + spreadY // Upward and vertical randomness
                     );
 
@@ -543,7 +549,8 @@
                 setTimeout(() => {
                     obj.body.gravity.y = gravity; // Apply gravity after delay
                     obj.body.velocity.setTo(
-                        direction === 'left' ? -speed + spreadX : speed + spreadX, // Adjust for opposite horizontal movement
+                        direction === 'left' ? -speed + spreadX : speed +
+                        spreadX, // Adjust for opposite horizontal movement
                         -speed * 0.8 + spreadY // Upward and vertical randomness
                     );
 
@@ -801,7 +808,7 @@
             });
         }
 
-        const specialEffectTimeout = 1000;
+        const specialEffectTimeout = 500;
 
         function specialEffect(fruit) {
             continueThrowing = false;
