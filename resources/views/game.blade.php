@@ -336,13 +336,11 @@
             var adjustedFireRate = fireRate - Math.floor(elapsedTime / 10000) * 500;
             adjustedFireRate = Math.max(adjustedFireRate, 500);
 
-            var badObjectProbability = 0.4 + Math.min(elapsedTime / 60000,
-                0.4); // Increase bad object probability over time
+            var badObjectProbability = 0.4 + Math.min(elapsedTime / 60000, 0.4); // Increase bad object probability over time
 
             if (game.time.now > nextFire) {
                 // Check if there are any items on the screen
-                var itemsOnScreen = good_objects1.countLiving() + good_objects2.countLiving() + good_objects3
-                    .countLiving() +
+                var itemsOnScreen = good_objects1.countLiving() + good_objects2.countLiving() + good_objects3.countLiving() +
                     good_objects4.countLiving() + good_objects5.countLiving() + good_objects6.countLiving() +
                     bad_objects1.countLiving() + bad_objects2.countLiving();
 
@@ -357,8 +355,7 @@
                 // Determine the number of objects to throw
                 var numObjectsToThrow;
                 if (elapsedTime < 5000) {
-                    numObjectsToThrow = isFirstThrow ? 1 : Math.floor(Math.random() * 5) +
-                        3; // 3-7 objects in the first 10 seconds
+                    numObjectsToThrow = isFirstThrow ? 1 : Math.floor(Math.random() * 5) + 3; // 3-7 objects in the first 10 seconds
                 } else {
                     numObjectsToThrow = Math.floor(Math.random() * 6) + 3; // 3-8 objects after 10 seconds
                 }
@@ -372,11 +369,10 @@
                 var clumpCenterX = game.world.centerX; // Center of the world
 
                 // Randomly position to the left or right by adding/subtracting an offset
-                var maxOffset = 100; // Adjust this value for how far the clump spreads
+                var maxOffset = 200; // Increase this value for a wider spread
                 var randomOffset = (Math.random() < 0.5 ? -1 : 1) * Math.random() * maxOffset;
 
                 var finalPositionX = clumpCenterX + randomOffset;
-
 
                 for (var i = 0; i < numObjectsToThrow; i++) {
                     var randomGoodObjectGroup;
@@ -409,7 +405,7 @@
 
             if (obj) {
                 // Random position within a clump range
-                var randomX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 100 - 50), 0, game.world.width);
+                var randomX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 200 - 100), 0, game.world.width); // Increase spread
                 var startY = clumpCenterY;
 
                 // Set object position at random x and bottom y
@@ -417,25 +413,24 @@
                 obj.anchor.setTo(0.5, 0.5);
 
                 // Random target within the clump range
-                var targetX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 100 - 50) + index * 80, 0, game.world
-                .width);
+                var targetX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 200 - 100) + index * 100, 0, game.world.width); // Increase spread
                 var targetY = Math.random() * (game.world.centerY - Math.random() * 100);
 
                 // Base speed and gravity
-                var baseSpeed = 800;
-                var baseGravity = 150;
+                var baseSpeed = 800; // Increase base speed
+                var baseGravity = 120; // Increase base gravity
 
                 // Increase falling speed and gravity as time progresses
-                var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 10;
-                var gravity = baseGravity + Math.floor(elapsedTime / 5000) * 10;
+                var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 20; // Increase speed increment
+                var gravity = baseGravity + Math.floor(elapsedTime / 5000) * 20; // Increase gravity increment
 
                 // Random horizontal throw velocity
-                var randomHorizontalVelocity = (Math.random() < 0.5 ? -1 : 1) * (Math.random() * 100 + 50);
+                var randomHorizontalVelocity = (Math.random() < 0.5 ? -1 : 1) * (Math.random() * 200 + 100); // Increase horizontal velocity
 
                 // Additional speed and gravity for 'good3' objects
                 if (obj.key === 'good3') {
-                    speed += 100;
-                    gravity += 200;
+                    speed += 200;
+                    gravity += 400;
                 }
 
                 // Set velocity directly to add randomness in horizontal movement
@@ -453,7 +448,7 @@
 
             if (obj) {
                 // Random position within a clump range
-                var randomX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 100 - 50), 0, game.world.width);
+                var randomX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 200 - 100), 0, game.world.width); // Increase spread
                 var startY = clumpCenterY;
 
                 // Set object position at random x and bottom y
@@ -461,20 +456,19 @@
                 obj.anchor.setTo(0.5, 0.5);
 
                 // Random target within the clump range
-                var targetX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 100 - 50) + index * 80, 0, game.world
-                .width);
+                var targetX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 200 - 100) + index * 100, 0, game.world.width); // Increase spread
                 var targetY = Math.random() * (game.world.centerY - Math.random() * 100);
 
                 // Base speed and gravity
-                var baseSpeed = 800;
-                var baseGravity = 150;
+                var baseSpeed = 800; // Increase base speed
+                var baseGravity = 120; // Increase base gravity
 
                 // Increase falling speed and gravity as time progresses
-                var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 10;
-                var gravity = baseGravity + Math.floor(elapsedTime / 5000) * 10;
+                var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 20; // Increase speed increment
+                var gravity = baseGravity + Math.floor(elapsedTime / 5000) * 20; // Increase gravity increment
 
                 // Random horizontal throw velocity
-                var randomHorizontalVelocity = (Math.random() < 0.5 ? -1 : 1) * (Math.random() * 100 + 50);
+                var randomHorizontalVelocity = (Math.random() < 0.5 ? -1 : 1) * (Math.random() * 200 + 100); // Increase horizontal velocity
 
                 // Set velocity directly to add randomness in horizontal movement
                 obj.body.velocity.setTo(randomHorizontalVelocity, -speed);
@@ -483,8 +477,6 @@
                 console.log("No dead objects available in the group.");
             }
         }
-
-
 
 
         var contactPoint = new Phaser.Point(0, 0);
@@ -500,16 +492,17 @@
                 contactPoint.y = game.input.y;
                 var distance = Phaser.Point.distance(contactPoint, new Phaser.Point(fruit.x, fruit.y));
                 if (distance > 110) {
-                    return;
+                    return false;
                 }
 
                 console.log('Distance:', distance, 'continueThrowing:', continueThrowing);
 
                 if (continueThrowing) {
                     console.log('Killing fruit:', fruit.key);
-                    killFruit(fruit);
+                    return true;
                 }
             }
+            return false;
         }
 
         function update() {
@@ -619,7 +612,6 @@
                 berryBg.height = 0;
             }
         }
-
 
 
         function resetScore() {
