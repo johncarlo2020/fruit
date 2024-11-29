@@ -130,8 +130,8 @@
 
         let timeElapsed = 0;
 
-        const objectSize = 160;
-        const berrySize = 160;
+        const objectSize = 200;
+        const berrySize = 200;
 
         function create() {
             game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -485,6 +485,33 @@
         }
 
 
+
+
+        var contactPoint = new Phaser.Point(0, 0);
+
+        function checkIntersects(fruit) {
+            var l1 = new Phaser.Line(fruit.body.x, fruit.body.y, fruit.body.x + fruit.body.width, fruit.body.y + fruit.body.height);
+            var l2 = new Phaser.Line(fruit.body.x, fruit.body.y + fruit.body.height, fruit.body.x + fruit.body.width, fruit.body.y);
+
+            if (Phaser.Line.intersects(line, l1, true) || Phaser.Line.intersects(line, l2, true)) {
+                console.log('Intersection detected with:', fruit.key);
+
+                contactPoint.x = game.input.x;
+                contactPoint.y = game.input.y;
+                var distance = Phaser.Point.distance(contactPoint, new Phaser.Point(fruit.x, fruit.y));
+                if (distance > 110) {
+                    return;
+                }
+
+                console.log('Distance:', distance, 'continueThrowing:', continueThrowing);
+
+                if (continueThrowing) {
+                    console.log('Killing fruit:', fruit.key);
+                    killFruit(fruit);
+                }
+            }
+        }
+
         function update() {
             throwObject();
 
@@ -537,19 +564,39 @@
                 timeElapsed = 0; // Reset timeElapsed for a new slash effect
             }
 
+            let fruitsToSlice = [];
+
             for (var i = 1; i < points.length; i++) {
                 line = new Phaser.Line(points[i].x, points[i].y, points[i - 1].x, points[i - 1].y);
                 // game.debug.geom(line);
 
-                good_objects1.forEachExists(checkIntersects);
-                good_objects2.forEachExists(checkIntersects);
-                good_objects3.forEachExists(checkIntersects);
-                good_objects4.forEachExists(checkIntersects);
-                good_objects5.forEachExists(checkIntersects);
-                good_objects6.forEachExists(checkIntersects);
-                bad_objects1.forEachExists(checkIntersects);
-                bad_objects2.forEachExists(checkIntersects);
+                good_objects1.forEachExists(fruit => {
+                    if (checkIntersects(fruit)) fruitsToSlice.push(fruit);
+                });
+                good_objects2.forEachExists(fruit => {
+                    if (checkIntersects(fruit)) fruitsToSlice.push(fruit);
+                });
+                good_objects3.forEachExists(fruit => {
+                    if (checkIntersects(fruit)) fruitsToSlice.push(fruit);
+                });
+                good_objects4.forEachExists(fruit => {
+                    if (checkIntersects(fruit)) fruitsToSlice.push(fruit);
+                });
+                good_objects5.forEachExists(fruit => {
+                    if (checkIntersects(fruit)) fruitsToSlice.push(fruit);
+                });
+                good_objects6.forEachExists(fruit => {
+                    if (checkIntersects(fruit)) fruitsToSlice.push(fruit);
+                });
+                bad_objects1.forEachExists(fruit => {
+                    if (checkIntersects(fruit)) fruitsToSlice.push(fruit);
+                });
+                bad_objects2.forEachExists(fruit => {
+                    if (checkIntersects(fruit)) fruitsToSlice.push(fruit);
+                });
             }
+
+            fruitsToSlice.forEach(fruit => killFruit(fruit));
 
             swordCursor.x = game.input.x;
             swordCursor.y = game.input.y;
@@ -573,32 +620,7 @@
             }
         }
 
-        var contactPoint = new Phaser.Point(0, 0);
 
-        function checkIntersects(fruit) {
-            var l1 = new Phaser.Line(fruit.body.x, fruit.body.y, fruit.body.x + fruit.body.width, fruit.body.y + fruit.body
-                .height);
-            var l2 = new Phaser.Line(fruit.body.x, fruit.body.y + fruit.body.height, fruit.body.x + fruit.body.width, fruit
-                .body.y);
-
-            if (Phaser.Line.intersects(line, l1, true) || Phaser.Line.intersects(line, l2, true)) {
-                console.log('Intersection detected with:', fruit.key);
-
-                contactPoint.x = game.input.x;
-                contactPoint.y = game.input.y;
-                var distance = Phaser.Point.distance(contactPoint, new Phaser.Point(fruit.x, fruit.y));
-                if (distance > 110) {
-                    return;
-                }
-
-                console.log('Distance:', distance, 'continueThrowing:', continueThrowing);
-
-                if (continueThrowing) {
-                    console.log('Killing fruit:', fruit.key);
-                    killFruit(fruit);
-                }
-            }
-        }
 
         function resetScore() {
             good_objects1.forEachExists(killFruit);
