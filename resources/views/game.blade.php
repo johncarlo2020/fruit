@@ -327,16 +327,17 @@
         var good3Counter = 0; // Counter for good3 objects
         var maxGood3Count = 9;
 
-        function throwObject() {
-            if (!continueThrowing) return; // Stop throwing objects if the flag is false
+        var throwDirection = 'bottom';
+        var throwInterval = 2000;
 
-            elapsedTime += game.time.elapsed; // Update elapsed time
+        function throwObject() {
+            if (!continueThrowing) return;
+
+            elapsedTime += game.time.elapsed;
 
             // Adjust fireRate based on elapsed time
-            var adjustedFireRate = fireRate - Math.floor(elapsedTime / 10000) * 500;
+            var adjustedFireRate = fireRate - Math.floor(elapsedTime / 1000) * 500;
             adjustedFireRate = Math.max(adjustedFireRate, 500);
-
-            var badObjectProbability = 0.4 + Math.min(elapsedTime / 60000, 0.4); // Increase bad object probability over time
 
             if (game.time.now > nextFire) {
                 // Check if there are any items on the screen
@@ -352,138 +353,222 @@
 
                 nextFire = game.time.now + adjustedFireRate;
 
-                // Determine the number of objects to throw
-                var numObjectsToThrow;
-                if (elapsedTime < 5000) {
-                    numObjectsToThrow = isFirstThrow ? 1 : Math.floor(Math.random() * 5) + 3; // 3-7 objects in the first 10 seconds
-                } else {
-                    numObjectsToThrow = Math.floor(Math.random() * 6) + 3; // 3-8 objects after 10 seconds
-                }
-                isFirstThrow = false; // Reset the first throw flag after the first throw
+                // Determine the number of objects to throw (between 4 and 6)
+                var numObjectsToThrow = Math.min(6, Math.floor(Math.random() * 3) + 4);  // Random number between 4 and 6
 
-                var good3Thrown = false; // Track if a good3 object has been thrown
+                var good3Thrown = false;
 
-                // Define a central point for the clump at the center of the screen
+                // Define central points for the clump at the center of the screen
                 var clumpCenterY = game.world.height - 10;
-
-                var clumpCenterX = game.world.centerX; // Center of the world
+                var clumpCenterX = game.world.centerX;
 
                 // Randomly position to the left or right by adding/subtracting an offset
                 var maxOffset = 200; // Increase this value for a wider spread
-                var randomOffset = (Math.random() < 0.5 ? -1 : 1) * Math.random() * maxOffset;
+                var randomOffset = (Math.random() < 0.2 ? -1 : 1) * Math.random() * maxOffset;
 
                 var finalPositionX = clumpCenterX + randomOffset;
 
+                // Determine throw directions
+                var directions = ['left', 'bottom'];
+                if (Math.random() < 0.5) {
+                    directions = ['right', 'bottom'];
+                }
+
+                // Track if good objects are thrown before throwing bad objects
+                var goodObjectsThrown = [];
+
+                // Throw objects
                 for (var i = 0; i < numObjectsToThrow; i++) {
                     var randomGoodObjectGroup;
                     do {
                         randomGoodObjectGroup = Math.floor(Math.random() * 6) + 1;
-                    } while (randomGoodObjectGroup === 3 && (good3Thrown || good3Counter >= maxGood3Count));
+                    } while (randomGoodObjectGroup === 3 && good3Thrown);
 
                     if (randomGoodObjectGroup === 3) {
-                        good3Counter++;
-                        good3Thrown = true; // Mark that a good3 object has been thrown
+                        good3Thrown = true;
                     }
 
-                    throwGoodObject(eval('good_objects' + randomGoodObjectGroup), finalPositionX, clumpCenterY, i);
+                    // Alternate between the two directions
+                    var direction = directions[i % 2];
+
+                    throwGoodObject(eval('good_objects' + randomGoodObjectGroup), finalPositionX, clumpCenterY, i, direction);
+
+                    // Track that a good object has been thrown
+                    goodObjectsThrown.push({ group: randomGoodObjectGroup, direction: direction });
                 }
 
-                if (Math.random() < badObjectProbability) {
-                    throwBadObject(bad_objects1, finalPositionX, clumpCenterY, numObjectsToThrow);
+                // Throw bad objects after good objects
+                if (Math.random() < 0.5) {
+                    throwBadObject(bad_objects1, finalPositionX, clumpCenterY, directions[i % 2]);
+                } else {
+                    throwBadObject(bad_objects2, finalPositionX, clumpCenterY, directions[i % 2]);
                 }
 
-                if (Math.random() < badObjectProbability) {
-                    throwBadObject(bad_objects2, finalPositionX, clumpCenterY, numObjectsToThrow);
-                }
+                // Set the next throw time based on the interval
+                nextFire = game.time.now + throwInterval;
             }
         }
 
-        function throwGoodObject(group, clumpCenterX, clumpCenterY, index) {
+
+
+        function throwGoodObject(group, clumpCenterX, clumpCenterY, index, direction) {
             var obj = group.getFirstDead();
 
-            console.log('Throwing object:', obj);
-
-            if (obj) {
-                // Random position within a clump range
-                var randomX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 200 - 100), 0, game.world.width); // Increase spread
-                var startY = clumpCenterY;
-
-                // Set object position at random x and bottom y
-                obj.reset(randomX, startY);
-                obj.anchor.setTo(0.5, 0.5);
-
-                // Random target within the clump range
-                var targetX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 200 - 100) + index * 100, 0, game.world.width); // Increase spread
-                var targetY = Math.random() * (game.world.centerY - Math.random() * 100);
-
-                // Base speed and gravity
-                var baseSpeed = 800; // Increase base speed
-                var baseGravity = 120; // Increase base gravity
-
-                // Increase falling speed and gravity as time progresses
-                var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 20; // Increase speed increment
-                var gravity = baseGravity + Math.floor(elapsedTime / 5000) * 20; // Increase gravity increment
-
-                // Random horizontal throw velocity
-                var randomHorizontalVelocity = (Math.random() < 0.5 ? -1 : 1) * (Math.random() * 200 + 100); // Increase horizontal velocity
-
-                // Additional speed and gravity for 'good3' objects
-                if (obj.key === 'good3') {
-                    speed += 200;
-                    gravity += 400;
-                }
-
-                // Set velocity directly to add randomness in horizontal movement
-                obj.body.velocity.setTo(randomHorizontalVelocity, -speed);
-                obj.body.gravity.y = gravity;
-            } else {
+            if (!obj) {
                 console.log("No dead objects available in the group.");
+                return;
+            }
+
+            var startX, startY;
+
+            // Define initial off-screen positions
+            if (direction === 'left') {
+                startX = game.world.width + 100; // Start off-screen to the right
+                startY = game.world.centerY + game.rnd.integerInRange(-150, 150); // Random vertical position
+            } else if (direction === 'right') {
+                startX = -100; // Start off-screen to the left
+                startY = game.world.centerY + game.rnd.integerInRange(-150, 150); // Random vertical position
+            } else {
+                // Default for upward throws
+                startX = Phaser.Math.clamp(clumpCenterX + game.rnd.integerInRange(-200, 200), 0, game.world.width);
+                startY = game.world.height + 50; // Start off-screen below
+            }
+
+            obj.reset(startX, startY);
+            obj.anchor.setTo(0.5, 0.5);
+
+            var baseSpeed = 900;
+            var baseGravity = 120;
+
+            // Adjust speed and gravity based on elapsed time
+            var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 20;
+            var gravity = baseGravity + Math.floor(elapsedTime / 5000) * 20;
+
+            // Special adjustment for 'good3' objects
+            if (obj.key === 'good3') {
+                speed += 200;
+                gravity += 100;
+            }
+
+            // Reduce speed and gravity only for left and right throws
+            if (direction === 'left' || direction === 'right') {
+                speed *= 0.3; // Half the speed
+                gravity *= 0.3; // Half the gravity
+            }
+
+            // Introduce randomness
+            var spreadX = game.rnd.integerInRange(-300, 300); // Horizontal spread
+            var spreadY = game.rnd.integerInRange(-100, 200); // Vertical spread
+
+            // Handle left and right directions with delay
+            if (direction === 'left' || direction === 'right') {
+                obj.body.velocity.setTo(0, 0); // No movement initially
+                obj.body.gravity.y = 0; // Temporarily disable gravity
+
+                setTimeout(() => {
+                    obj.body.gravity.y = gravity; // Apply gravity after delay
+                    obj.body.velocity.setTo(
+                        direction === 'left' ? -speed + spreadX : speed + spreadX, // Adjust for opposite horizontal movement
+                        -speed * 0.8 + spreadY // Upward and vertical randomness
+                    );
+
+                    // Move object into view
+                    obj.x = direction === 'left' ? game.world.width - 50 : 50; // Appear just inside screen bounds
+                }, 1000); // 1-second delay
+            } else {
+                // Apply velocity and gravity immediately for other directions
+                obj.body.velocity.setTo(
+                    game.rnd.integerInRange(-100, 100) + spreadX, // Random horizontal movement with spread
+                    -speed + spreadY // Upward trajectory with vertical spread
+                );
+                obj.body.gravity.y = gravity;
             }
         }
 
-        function throwBadObject(group, clumpCenterX, clumpCenterY, index) {
+
+        function throwBadObject(group, clumpCenterX, clumpCenterY, index, direction) {
             var obj = group.getFirstDead();
 
-            console.log('Throwing object:', obj);
-
-            if (obj) {
-                // Random position within a clump range
-                var randomX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 200 - 100), 0, game.world.width); // Increase spread
-                var startY = clumpCenterY;
-
-                // Set object position at random x and bottom y
-                obj.reset(randomX, startY);
-                obj.anchor.setTo(0.5, 0.5);
-
-                // Random target within the clump range
-                var targetX = Phaser.Math.clamp(clumpCenterX + (Math.random() * 200 - 100) + index * 100, 0, game.world.width); // Increase spread
-                var targetY = Math.random() * (game.world.centerY - Math.random() * 100);
-
-                // Base speed and gravity
-                var baseSpeed = 800; // Increase base speed
-                var baseGravity = 120; // Increase base gravity
-
-                // Increase falling speed and gravity as time progresses
-                var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 20; // Increase speed increment
-                var gravity = baseGravity + Math.floor(elapsedTime / 5000) * 20; // Increase gravity increment
-
-                // Random horizontal throw velocity
-                var randomHorizontalVelocity = (Math.random() < 0.5 ? -1 : 1) * (Math.random() * 200 + 100); // Increase horizontal velocity
-
-                // Set velocity directly to add randomness in horizontal movement
-                obj.body.velocity.setTo(randomHorizontalVelocity, -speed);
-                obj.body.gravity.y = gravity;
-            } else {
+            if (!obj) {
                 console.log("No dead objects available in the group.");
+                return;
+            }
+
+            var startX, startY;
+
+            // Define initial off-screen positions
+            if (direction === 'left') {
+                startX = game.world.width + 100; // Start off-screen to the right
+                startY = game.world.centerY + game.rnd.integerInRange(-150, 150); // Random vertical position
+            } else if (direction === 'right') {
+                startX = -100; // Start off-screen to the left
+                startY = game.world.centerY + game.rnd.integerInRange(-150, 150); // Random vertical position
+            } else {
+                // Default for upward throws
+                startX = Phaser.Math.clamp(clumpCenterX + game.rnd.integerInRange(-200, 200), 0, game.world.width);
+                startY = game.world.height + 50; // Start off-screen below
+            }
+
+            obj.reset(startX, startY);
+            obj.anchor.setTo(0.5, 0.5);
+
+            var baseSpeed = 800;
+            var baseGravity = 120;
+
+            // Adjust speed and gravity based on elapsed time
+            var speed = baseSpeed + Math.floor(elapsedTime / 5000) * 20;
+            var gravity = baseGravity + Math.floor(elapsedTime / 5000) * 20;
+
+            // Special adjustment for 'good3' objects
+            if (obj.key === 'good3') {
+                speed += 200;
+                gravity += 100;
+            }
+
+            // Reduce speed and gravity only for left and right throws
+            if (direction === 'left' || direction === 'right') {
+                speed *= 0.3; // Half the speed
+                gravity *= 0.3; // Half the gravity
+            }
+
+            // Introduce randomness
+            var spreadX = game.rnd.integerInRange(-400, 400); // Horizontal spread
+            var spreadY = game.rnd.integerInRange(-100, 200); // Vertical spread
+
+            // Handle left and right directions with delay
+            if (direction === 'left' || direction === 'right') {
+                obj.body.velocity.setTo(0, 0); // No movement initially
+                obj.body.gravity.y = 0; // Temporarily disable gravity
+
+                setTimeout(() => {
+                    obj.body.gravity.y = gravity; // Apply gravity after delay
+                    obj.body.velocity.setTo(
+                        direction === 'left' ? -speed + spreadX : speed + spreadX, // Adjust for opposite horizontal movement
+                        -speed * 0.8 + spreadY // Upward and vertical randomness
+                    );
+
+                    // Move object into view
+                    obj.x = direction === 'left' ? game.world.width - 50 : 50; // Appear just inside screen bounds
+                }, 1000); // 1-second delay
+            } else {
+                // Apply velocity and gravity immediately for other directions
+                obj.body.velocity.setTo(
+                    game.rnd.integerInRange(-100, 100) + spreadX, // Random horizontal movement with spread
+                    -speed + spreadY // Upward trajectory with vertical spread
+                );
+                obj.body.gravity.y = gravity;
             }
         }
+
 
 
         var contactPoint = new Phaser.Point(0, 0);
 
         function checkIntersects(fruit) {
-            var l1 = new Phaser.Line(fruit.body.x, fruit.body.y, fruit.body.x + fruit.body.width, fruit.body.y + fruit.body.height);
-            var l2 = new Phaser.Line(fruit.body.x, fruit.body.y + fruit.body.height, fruit.body.x + fruit.body.width, fruit.body.y);
+            var l1 = new Phaser.Line(fruit.body.x, fruit.body.y, fruit.body.x + fruit.body.width, fruit.body.y + fruit.body
+                .height);
+            var l2 = new Phaser.Line(fruit.body.x, fruit.body.y + fruit.body.height, fruit.body.x + fruit.body.width, fruit
+                .body.y);
 
             if (Phaser.Line.intersects(line, l1, true) || Phaser.Line.intersects(line, l2, true)) {
                 console.log('Intersection detected with:', fruit.key);
