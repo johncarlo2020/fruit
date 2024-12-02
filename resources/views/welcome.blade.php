@@ -69,7 +69,7 @@
         cursor: url('images/cursor.png'), auto;
     }
 
-    .btn {
+    .start {
         display: block;
         width: 323px;
         height: 121px;
@@ -86,14 +86,14 @@
         outline: none;
     }
 
-    .btn img {
+    .start img {
         width: 100%;
         height: 100%;
         object-fit: contain;
         border-radius: 5px;
     }
 
-    .btn::after {
+    .start::after {
         content: '';
         display: block;
         position: absolute;
@@ -120,6 +120,37 @@
     #reader {
         transform: rotate(-90deg) scaleX(-1);
     }
+    .options {
+        display:none;
+        position: absolute;
+        bottom: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .options .btn {
+        display: block;
+        margin-bottom: 20px;
+    }
+    .input-container {
+        display:none;
+        position: absolute;
+        bottom: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 50%;
+    }
+
+    .input-container input {
+        width: 100%;
+        height: 50px;
+        border: 5px solid #000000;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 20px;
+        outline: none;
+        background: #FFEEB8;
+    }
 </style>
 
 <body class="welcome-page">
@@ -129,10 +160,23 @@
             <div id="reader"></div>
         </div>
     </div>
-    <a class="btn">
+    <a class="btn start">
         <img src="{{ asset('images/start.webp') }}" alt="">
-
     </a>
+
+    <div class="options">
+        <a class="btn member">
+            <img src="{{ asset('images/MEMBER.webp') }}" alt="">
+        </a>
+        <a class="btn non-member">
+            <img src="{{ asset('images/NONMEMEBER.webp') }}" alt="">
+        </a>
+    </div>
+
+    <div class="input-container">
+        <input type="text">
+    </div>
+
 </body>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
 
@@ -152,7 +196,11 @@
 
     var QRmode = false;
     const page = document.querySelector('.welcome-page');
-    const btn = document.querySelector('.btn');
+    const btn = document.querySelector('.start');
+    const member = document.querySelector('.member');
+    const nonMember = document.querySelector('.non-member');
+    const options = document.querySelector('.options');
+    const inputContainer = document.querySelector('.input-container');
 
     const flow = ['welcome', 'howtoplay', 'scanqr', 'countdown'];
 
@@ -178,8 +226,20 @@
             name
         };
     }
+    nonMember.addEventListener('mouseenter',() => {
+        options.style.display = 'none';
+        inputContainer.style.display = 'block';
+    });
 
     btn.addEventListener('mouseenter', () => {
+
+        page.style.backgroundImage = 'url({{ asset('images/memberpage.webp') }})';
+        btn.style.display = 'none';
+        options.style.display = 'block';
+    });
+
+    member.addEventListener('mouseenter', () => {
+        options.style.display = 'none';
         page.style.backgroundImage = 'url({{ asset('images/Howtoplay.webp') }})';
         btn.style.display = 'none';
         currentFlow++;
