@@ -10,6 +10,8 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/simple-keyboard/build/css/index.css">
+    <script src="https://unpkg.com/simple-keyboard/build/index.js"></script>
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -120,8 +122,9 @@
     #reader {
         transform: rotate(-90deg) scaleX(-1);
     }
+
     .options {
-        display:none;
+        display: none;
         position: absolute;
         bottom: 20%;
         left: 50%;
@@ -132,8 +135,9 @@
         display: block;
         margin-bottom: 20px;
     }
+
     .input-container {
-        display:none;
+        display: none;
         position: absolute;
         bottom: 50%;
         left: 50%;
@@ -174,13 +178,64 @@
     </div>
 
     <div class="input-container">
-        <input type="text">
+        <input type="text" id="textInput">
+        <div id="keyboardContainer" class="simple-keyboard"></div>
+
+
     </div>
 
 </body>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
 
+
 <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const keyboard = new SimpleKeyboard.default({
+            onChange: input => onInputChange(input),
+            onKeyPress: button => onKeyPress(button),
+            layout: {
+                default: ["q w e r t y u i o p", "a s d f g h j k l", "{shift} z x c v b n m {bksp}",
+                    "{space}"
+                ],
+                shift: ["Q W E R T Y U I O P", "A S D F G H J K L", "{shift} Z X C V B N M {bksp}",
+                    "{space}"
+                ]
+            },
+            theme: "hg-theme-default myCustomTheme",
+            debug: true, // Enable debugging to catch issues
+            inputName: "textInput", // Link to the input field
+            onInit: () => console.log("Keyboard initialized"),
+            keyboardDOMClass: "keyboard-wrapper" // Class for the keyboard DOM
+        });
+
+        // Function to update the input field
+        function onInputChange(input) {
+            document.getElementById("textInput").value = input;
+        }
+
+        // Handle special keys (like shift)
+        function onKeyPress(button) {
+            if (button === "{shift}") {
+                keyboard.setOptions({
+                    layoutName: keyboard.options.layoutName === "default" ? "shift" : "default"
+                });
+            }
+        }
+
+        // Show keyboard when input is focused
+        document.getElementById("textInput").addEventListener("focus", () => {
+            document.getElementById("keyboardContainer").style.display = "block";
+            console.log('asdas');
+        });
+
+        // Hide the keyboard when clicking outside
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest("#textInput") && !event.target.closest("#keyboardContainer")) {
+                document.getElementById("keyboardContainer").style.display = "none";
+            }
+        });
+    });
+
     const audio = new Audio('{{ asset('sounds/background.mp3') }}');
     audio.loop = true;
     const countdownSound = new Audio('{{ asset('sounds/countdown.mp3') }}');
@@ -206,6 +261,10 @@
 
     let currentFlow = 0;
 
+    // Initialize the virtual keyboard
+
+
+
     function extractDetails(qrData) {
         // Remove the curly braces at the start and end
         const trimmedData = qrData.slice(1, -1);
@@ -226,7 +285,7 @@
             name
         };
     }
-    nonMember.addEventListener('mouseenter',() => {
+    nonMember.addEventListener('mouseenter', () => {
         options.style.display = 'none';
         inputContainer.style.display = 'block';
     });
