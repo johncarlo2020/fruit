@@ -10,8 +10,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://unpkg.com/simple-keyboard/build/css/index.css">
-    <script src="https://unpkg.com/simple-keyboard/build/index.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/css/index.css">
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -88,12 +87,31 @@
         outline: none;
     }
 
-    .start img {
+    .start-none {
+        display: block;
+        width: 323px;
+        height: 121px;
+        margin: 20px;
+        color: #000000;
+        text-decoration: none;
+        border-radius: 5px;
+        position: absolute;
+        bottom: -80%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: none;
+        cursor: pointer;
+        outline: none;
+    }
+
+    .start-none img {
         width: 100%;
         height: 100%;
         object-fit: contain;
         border-radius: 5px;
     }
+
+
 
     .start::after {
         content: '';
@@ -139,11 +157,17 @@
     .input-container {
         display: none;
         position: absolute;
-        bottom: 50%;
+        bottom: 30%;
         left: 50%;
         transform: translate(-50%, -50%);
         width: 50%;
     }
+
+    .simple-keyboard {
+        margin-top: 3%;
+        width: 106%;
+    }
+
 
     .input-container input {
         width: 100%;
@@ -177,64 +201,35 @@
         </a>
     </div>
 
-    <div class="input-container">
-        <input type="text" id="textInput">
-        <div id="keyboardContainer" class="simple-keyboard"></div>
-
+    <div class="input-container non-member" id=noneMember>
+        <input class="input" type="text" id="textInput">
+        <div class="simple-keyboard"></div>
+        <a class="btn start-none">
+            <img src="{{ asset('images/start.webp') }}" alt="">
+        </a>
 
     </div>
 
 </body>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const keyboard = new SimpleKeyboard.default({
-            onChange: input => onInputChange(input),
-            onKeyPress: button => onKeyPress(button),
-            layout: {
-                default: ["q w e r t y u i o p", "a s d f g h j k l", "{shift} z x c v b n m {bksp}",
-                    "{space}"
-                ],
-                shift: ["Q W E R T Y U I O P", "A S D F G H J K L", "{shift} Z X C V B N M {bksp}",
-                    "{space}"
-                ]
-            },
-            theme: "hg-theme-default myCustomTheme",
-            debug: true, // Enable debugging to catch issues
-            inputName: "textInput", // Link to the input field
-            onInit: () => console.log("Keyboard initialized"),
-            keyboardDOMClass: "keyboard-wrapper" // Class for the keyboard DOM
-        });
+    const Keyboard = window.SimpleKeyboard.default;
 
-        // Function to update the input field
-        function onInputChange(input) {
-            document.getElementById("textInput").value = input;
-        }
-
-        // Handle special keys (like shift)
-        function onKeyPress(button) {
-            if (button === "{shift}") {
-                keyboard.setOptions({
-                    layoutName: keyboard.options.layoutName === "default" ? "shift" : "default"
-                });
-            }
-        }
-
-        // Show keyboard when input is focused
-        document.getElementById("textInput").addEventListener("focus", () => {
-            document.getElementById("keyboardContainer").style.display = "block";
-            console.log('asdas');
-        });
-
-        // Hide the keyboard when clicking outside
-        document.addEventListener("click", (event) => {
-            if (!event.target.closest("#textInput") && !event.target.closest("#keyboardContainer")) {
-                document.getElementById("keyboardContainer").style.display = "none";
-            }
-        });
+    const myKeyboard = new Keyboard({
+        onChange: input => onChange(input),
+        onKeyPress: button => onKeyPress(button)
     });
+
+    function onChange(input) {
+        document.querySelector(".input").value = input;
+        console.log("Input changed", input);
+    }
+
+    function onKeyPress(button) {
+        console.log("Button pressed", button);
+    }
 
     const audio = new Audio('{{ asset('sounds/background.mp3') }}');
     audio.loop = true;
@@ -256,6 +251,8 @@
     const nonMember = document.querySelector('.non-member');
     const options = document.querySelector('.options');
     const inputContainer = document.querySelector('.input-container');
+    const startNone = document.querySelector('.start-none');
+
 
     const flow = ['welcome', 'howtoplay', 'scanqr', 'countdown'];
 
@@ -285,19 +282,39 @@
             name
         };
     }
-    nonMember.addEventListener('mouseenter', () => {
+    nonMember.addEventListener('click', () => {
         options.style.display = 'none';
         inputContainer.style.display = 'block';
     });
 
-    btn.addEventListener('mouseenter', () => {
+    function generateRandomId() {
+        return Math.floor(10000000 + Math.random() * 90000000); // Generates an 8-digit random number
+    }
+
+    startNone.addEventListener('click', () => {
+        const textInput = document.getElementById('textInput');
+        currentUser = {
+            id: generateRandomId(),
+            name: textInput.value,
+            score: 0,
+            phone: 'none-member',
+            email: 'none-member',
+        };
+
+
+        // Convert the object to a JSON string and store it in local storage
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        countdown();
+    });
+
+    btn.addEventListener('click', () => {
 
         page.style.backgroundImage = 'url({{ asset('images/memberpage.webp') }})';
         btn.style.display = 'none';
         options.style.display = 'block';
     });
 
-    member.addEventListener('mouseenter', () => {
+    member.addEventListener('click', () => {
         options.style.display = 'none';
         page.style.backgroundImage = 'url({{ asset('images/Howtoplay.webp') }})';
         btn.style.display = 'none';
@@ -366,6 +383,9 @@
     function countdown() {
         countdownSound.play();
         const scanner = document.querySelector('#scannerContainer');
+        const noneMember = document.querySelector('#noneMember');
+        noneMember.style.display = 'none';
+
         scanner.style.display = 'none';
         page.style.backgroundImage = 'url({{ asset('images/countdown.webp') }})';
         const name = document.createElement('h1');
